@@ -14,7 +14,13 @@ const defaultConfig = {
   strictMode: true,
   minConfidence: 70,
   ignoreKnownDomains: true,
-  customIgnoredDomains: []
+  customIgnoredDomains: [],
+  // Ecosystem settings
+  enableRubyGems: true,
+  enableCargo: true,
+  enableNuGet: true,
+  enableMaven: true,
+  rateLimitDelay: 100
 };
 
 // Load settings on page load
@@ -27,6 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupEventListeners() {
   document.getElementById('saveBtn').addEventListener('click', saveSettings);
   document.getElementById('resetBtn').addEventListener('click', resetSettings);
+  document.getElementById('testWebhookBtn').addEventListener('click', testDiscordWebhook);
+}
+
+// Test Discord webhook
+function testDiscordWebhook() {
+  const webhookUrl = document.getElementById('discordWebhook').value.trim();
+
+  if (!webhookUrl) {
+    showAlert('Por favor, insira uma URL de webhook do Discord primeiro.', 'error');
+    return;
+  }
+
+  if (!isValidDiscordWebhook(webhookUrl)) {
+    showAlert('Invalid Discord Webhook URL.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('testWebhookBtn');
+  const originalText = btn.textContent;
+  btn.textContent = '⏳ Testing...';
+  btn.disabled = true;
+
+  chrome.runtime.sendMessage({
+    action: 'testDiscordCallback',
+    webhookUrl: webhookUrl
+  }, (response) => {
+    btn.textContent = originalText;
+    btn.disabled = false;
+
+    if (response && response.success) {
+      showAlert('✅ Webhook tested successfully! Check your Discord channel.', 'success');
+    } else {
+      showAlert('❌ Failed to test webhook. Check the URL and try again.', 'error');
+    }
+  });
 }
 
 // Load settings from storage
@@ -47,6 +88,12 @@ function loadSettings() {
       document.getElementById('minConfidence').value = config.minConfidence || 70;
       document.getElementById('ignoreKnownDomains').checked = config.ignoreKnownDomains !== false;
       document.getElementById('customIgnoredDomains').value = (config.customIgnoredDomains || []).join(', ');
+      // New ecosystem settings
+      document.getElementById('enableRubyGems').checked = config.enableRubyGems !== false;
+      document.getElementById('enableCargo').checked = config.enableCargo !== false;
+      document.getElementById('enableNuGet').checked = config.enableNuGet !== false;
+      document.getElementById('enableMaven').checked = config.enableMaven !== false;
+      document.getElementById('rateLimitDelay').value = config.rateLimitDelay || 100;
     }
   });
 }
@@ -72,34 +119,40 @@ function saveSettings() {
     strictMode: document.getElementById('strictMode').checked,
     minConfidence: parseInt(document.getElementById('minConfidence').value) || 70,
     ignoreKnownDomains: document.getElementById('ignoreKnownDomains').checked,
-    customIgnoredDomains: customDomains
+    customIgnoredDomains: customDomains,
+    // Ecosystem settings
+    enableRubyGems: document.getElementById('enableRubyGems').checked,
+    enableCargo: document.getElementById('enableCargo').checked,
+    enableNuGet: document.getElementById('enableNuGet').checked,
+    enableMaven: document.getElementById('enableMaven').checked,
+    rateLimitDelay: parseInt(document.getElementById('rateLimitDelay').value) || 100
   };
 
   // Validate Discord webhook URL
   if (config.discordWebhook && !isValidDiscordWebhook(config.discordWebhook)) {
-    showAlert('URL do Discord Webhook inválida. Verifique e tente novamente.', 'error');
+    showAlert('Invalid Discord Webhook URL. Verifique e tente novamente.', 'error');
     return;
   }
 
   // Validate proxy URL
   if (config.proxyUrl && !isValidUrl(config.proxyUrl)) {
-    showAlert('URL do Proxy inválida. Verifique e tente novamente.', 'error');
+    showAlert('Invalid Proxy URL. Check and try again.', 'error');
     return;
   }
 
   // Save to storage
   chrome.runtime.sendMessage({ action: 'updateConfig', config: config }, (response) => {
     if (response && response.success) {
-      showAlert('Configurações salvas com sucesso!', 'success');
+      showAlert('Settings saved successfully!', 'success');
     } else {
-      showAlert('Erro ao salvar configurações.', 'error');
+      showAlert('Error saving settings.', 'error');
     }
   });
 }
 
 // Reset settings to defaults
 function resetSettings() {
-  if (confirm('Tem certeza que deseja restaurar as configurações padrão?')) {
+  if (confirm('Are you sure you want to restore default settings?')) {
     document.getElementById('discordWebhook').value = defaultConfig.discordWebhook;
     document.getElementById('proxyUrl').value = defaultConfig.proxyUrl;
     document.getElementById('autoCheck').checked = defaultConfig.autoCheck;
@@ -113,10 +166,16 @@ function resetSettings() {
     document.getElementById('minConfidence').value = defaultConfig.minConfidence;
     document.getElementById('ignoreKnownDomains').checked = defaultConfig.ignoreKnownDomains;
     document.getElementById('customIgnoredDomains').value = '';
+    // Ecosystem settings
+    document.getElementById('enableRubyGems').checked = defaultConfig.enableRubyGems;
+    document.getElementById('enableCargo').checked = defaultConfig.enableCargo;
+    document.getElementById('enableNuGet').checked = defaultConfig.enableNuGet;
+    document.getElementById('enableMaven').checked = defaultConfig.enableMaven;
+    document.getElementById('rateLimitDelay').value = defaultConfig.rateLimitDelay;
 
     chrome.runtime.sendMessage({ action: 'updateConfig', config: defaultConfig }, (response) => {
       if (response && response.success) {
-        showAlert('Configurações restauradas para o padrão!', 'success');
+        showAlert('Settings restored to defaults!', 'success');
       }
     });
   }

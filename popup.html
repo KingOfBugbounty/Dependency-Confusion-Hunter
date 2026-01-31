@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,88 +9,632 @@
 <body>
   <div class="container">
     <header>
-      <h1>🎯 Dependency Hunter</h1>
+      <div class="header-main">
+        <h1>🎯 Dependency Hunter</h1>
+        <span class="version">v1.4.0</span>
+      </div>
       <p class="author">by OFJAAAH</p>
+      <div class="keyboard-hint">Press <kbd>?</kbd> for shortcuts</div>
     </header>
 
     <div class="tabs">
-      <button class="tab-button active" data-tab="findings">🔍 Achados Atuais</button>
-      <button class="tab-button" data-tab="history">📜 Histórico</button>
+      <button class="tab-button active" data-tab="findings" title="Ctrl+1">🔍 Findings</button>
+      <button class="tab-button" data-tab="history" title="Ctrl+2">📜 History</button>
+      <button class="tab-button" data-tab="callbacks" title="Ctrl+3">🔔 Callbacks</button>
+      <button class="tab-button" data-tab="recon" title="Ctrl+4">🕵️ Recon</button>
+      <button class="tab-button" data-tab="targets" title="Ctrl+5">🎯 Targets</button>
+      <button class="tab-button" data-tab="tutorials" title="Ctrl+6">📚 Tutorials</button>
+      <button class="tab-button" data-tab="tools" title="Ctrl+7">🛠️ Tools</button>
     </div>
 
-    <div class="stats">
-      <div class="stat-card vulnerable">
-        <div class="stat-number" id="vulnerableCount">0</div>
-        <div class="stat-label">Vulnerabilidades</div>
+    <!-- Enhanced Stats Dashboard -->
+    <div class="stats-dashboard">
+      <div class="stats-row">
+        <div class="stat-card critical">
+          <div class="stat-number" id="criticalCount">0</div>
+          <div class="stat-label">Critical</div>
+        </div>
+        <div class="stat-card high">
+          <div class="stat-number" id="highCount">0</div>
+          <div class="stat-label">High</div>
+        </div>
+        <div class="stat-card medium">
+          <div class="stat-number" id="mediumCount">0</div>
+          <div class="stat-label">Medium</div>
+        </div>
+        <div class="stat-card total">
+          <div class="stat-number" id="vulnerableCount">0</div>
+          <div class="stat-label">Total</div>
+        </div>
       </div>
-      <div class="stat-card scanned">
-        <div class="stat-number" id="scannedCount">0</div>
-        <div class="stat-label">Arquivos Analisados</div>
-      </div>
-      <div class="stat-card history">
-        <div class="stat-number" id="historyCount">0</div>
-        <div class="stat-label">Histórico Total</div>
+      <div class="stats-row ecosystem-stats">
+        <div class="eco-stat" title="npm packages">
+          <span class="eco-icon">📦</span>
+          <span class="eco-count" id="npmCount">0</span>
+          <span class="eco-label">npm</span>
+        </div>
+        <div class="eco-stat" title="PyPI packages">
+          <span class="eco-icon">🐍</span>
+          <span class="eco-count" id="pypiCount">0</span>
+          <span class="eco-label">PyPI</span>
+        </div>
+        <div class="eco-stat" title="RubyGems packages">
+          <span class="eco-icon">💎</span>
+          <span class="eco-count" id="gemCount">0</span>
+          <span class="eco-label">Gems</span>
+        </div>
+        <div class="eco-stat" title="Go modules">
+          <span class="eco-icon">🔷</span>
+          <span class="eco-count" id="goCount">0</span>
+          <span class="eco-label">Go</span>
+        </div>
+        <div class="eco-stat" title="Cargo crates">
+          <span class="eco-icon">🦀</span>
+          <span class="eco-count" id="cargoCount">0</span>
+          <span class="eco-label">Cargo</span>
+        </div>
+        <div class="eco-stat" title="Composer packages">
+          <span class="eco-icon">🎼</span>
+          <span class="eco-count" id="composerCount">0</span>
+          <span class="eco-label">PHP</span>
+        </div>
       </div>
     </div>
 
     <div class="actions">
-      <button id="refreshBtn" class="btn btn-primary">🔄 Atualizar</button>
-      <button id="clearBtn" class="btn btn-secondary">🗑️ Limpar</button>
-      <button id="settingsBtn" class="btn btn-secondary">⚙️ Configurações</button>
+      <button id="refreshBtn" class="btn btn-primary" title="Ctrl+R">🔄 Refresh</button>
+      <button id="clearBtn" class="btn btn-secondary" title="Ctrl+X">🗑️ Clear</button>
+      <button id="exportBtn" class="btn btn-secondary" title="Ctrl+E">📊 Export</button>
+      <button id="settingsBtn" class="btn btn-secondary" title="Ctrl+S">⚙️ Settings</button>
     </div>
 
+    <!-- Findings Tab -->
     <div id="findingsTab" class="tab-content active">
       <div class="findings-container">
-        <h2>Pacotes Vulneráveis</h2>
+        <div class="section-header">
+          <h2>🔍 Vulnerable Packages</h2>
+          <div class="section-actions">
+            <button id="createPoCBtn" class="btn btn-small btn-primary" title="Ctrl+P">🚀 Create PoC</button>
+            <button id="generateReportBtn" class="btn btn-small btn-secondary">📝 Report</button>
+          </div>
+        </div>
         <div id="findingsList" class="findings-list">
           <div class="empty-state">
-            <p>Nenhuma vulnerabilidade encontrada ainda.</p>
-            <p class="help-text">Navegue em sites que usam JavaScript e a extensão irá detectar automaticamente pacotes que não existem publicamente.</p>
+            <p>No vulnerabilities found yet.</p>
+            <p class="help-text">Browse websites with JavaScript dependencies and the extension will automatically detect packages that don't exist publicly.</p>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- History Tab -->
     <div id="historyTab" class="tab-content">
       <div class="findings-container">
-        <h2>Histórico de Detecções</h2>
+        <div class="section-header">
+          <h2>📜 Detection History</h2>
+        </div>
         <div class="history-actions">
-          <button id="clearHistoryBtn" class="btn btn-small btn-secondary">🗑️ Limpar Histórico</button>
-          <button id="exportHistoryBtn" class="btn btn-small btn-secondary">📊 Exportar</button>
+          <button id="clearHistoryBtn" class="btn btn-small btn-secondary">🗑️ Clear History</button>
+          <button id="exportHistoryBtn" class="btn btn-small btn-secondary">📊 Export CSV</button>
+          <button id="exportJSONBtn" class="btn btn-small btn-secondary">📋 Export JSON</button>
         </div>
         <div id="historyList" class="findings-list">
           <div class="empty-state">
-            <p>Nenhum histórico disponível.</p>
-            <p class="help-text">O histórico mostra todas as detecções anteriores de pacotes vulneráveis.</p>
+            <p>No history available.</p>
+            <p class="help-text">History shows all previous detections of vulnerable packages.</p>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Callbacks Tab -->
+    <div id="callbacksTab" class="tab-content">
+      <div class="findings-container">
+        <div class="section-header">
+          <h2>🔔 Received Callbacks</h2>
+        </div>
+        <div class="callback-status" id="callbackStatusBox">
+          <div class="status-indicator" id="callbackIndicator">
+            <span class="dot" id="callbackDot"></span>
+            <span id="callbackStatusText">Discord Webhook</span>
+          </div>
+        </div>
+        <div class="history-actions">
+          <button id="testCallbackBtn" class="btn btn-small btn-primary">🧪 Test Callback</button>
+          <button id="clearCallbacksBtn" class="btn btn-small btn-secondary">🗑️ Clear</button>
+          <button id="refreshCallbacksBtn" class="btn btn-small btn-secondary">🔄 Refresh</button>
+        </div>
+        <div id="callbacksList" class="findings-list">
+          <div class="empty-state">
+            <p>No callbacks received yet.</p>
+            <p class="help-text">Configure Discord Webhook in settings to receive callbacks from PoC packages.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recon Tab (NEW) -->
+    <div id="reconTab" class="tab-content">
+      <div class="findings-container">
+        <div class="section-header">
+          <h2>🕵️ Reconnaissance Tools</h2>
+        </div>
+
+        <!-- Target Input -->
+        <div class="recon-input-group">
+          <input type="text" id="reconTarget" placeholder="Enter target domain (e.g., example.com)" class="recon-input">
+          <button id="generateDorksBtn" class="btn btn-primary">🔍 Generate Dorks</button>
+        </div>
+
+        <!-- GitHub Dorking -->
+        <div class="recon-section">
+          <h3>🐙 GitHub Dorking Queries</h3>
+          <div id="githubDorks" class="dorks-list">
+            <div class="dork-item">
+              <code>site:github.com "target" filename:package.json</code>
+              <button class="btn-copy" data-copy="site:github.com &quot;target&quot; filename:package.json">📋</button>
+            </div>
+            <div class="dork-item">
+              <code>site:github.com "target" filename:requirements.txt</code>
+              <button class="btn-copy" data-copy="site:github.com &quot;target&quot; filename:requirements.txt">📋</button>
+            </div>
+            <div class="dork-item">
+              <code>site:github.com "target" filename:Gemfile</code>
+              <button class="btn-copy" data-copy="site:github.com &quot;target&quot; filename:Gemfile">📋</button>
+            </div>
+            <div class="dork-item">
+              <code>site:github.com "target" filename:go.mod</code>
+              <button class="btn-copy" data-copy="site:github.com &quot;target&quot; filename:go.mod">📋</button>
+            </div>
+            <div class="dork-item">
+              <code>site:github.com "target" filename:composer.json</code>
+              <button class="btn-copy" data-copy="site:github.com &quot;target&quot; filename:composer.json">📋</button>
+            </div>
+            <div class="dork-item">
+              <code>site:github.com "target" filename:Cargo.toml</code>
+              <button class="btn-copy" data-copy="site:github.com &quot;target&quot; filename:Cargo.toml">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wayback Machine -->
+        <div class="recon-section">
+          <h3>🕰️ Wayback Machine</h3>
+          <div class="wayback-actions">
+            <button id="checkWaybackBtn" class="btn btn-small btn-primary">🔍 Check Archives</button>
+            <button id="openWaybackBtn" class="btn btn-small btn-secondary">🌐 Open Wayback</button>
+          </div>
+          <div id="waybackResults" class="wayback-results">
+            <div class="empty-state small">
+              <p>Enter a target and click "Check Archives" to find historical manifest files.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Common Paths Scanner -->
+        <div class="recon-section">
+          <h3>📂 Common Paths</h3>
+          <div class="paths-list">
+            <div class="path-item"><code>/package.json</code></div>
+            <div class="path-item"><code>/package-lock.json</code></div>
+            <div class="path-item"><code>/yarn.lock</code></div>
+            <div class="path-item"><code>/static/package.json</code></div>
+            <div class="path-item"><code>/.next/package.json</code></div>
+            <div class="path-item"><code>/dist/package.json</code></div>
+            <div class="path-item"><code>/build/package.json</code></div>
+            <div class="path-item"><code>/assets/package.json</code></div>
+          </div>
+          <button id="scanPathsBtn" class="btn btn-small btn-primary">🔍 Scan All Paths</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Targets Tab (NEW) -->
+    <div id="targetsTab" class="tab-content">
+      <div class="findings-container">
+        <div class="section-header">
+          <h2>🎯 Target Management</h2>
+        </div>
+
+        <!-- Batch Import -->
+        <div class="targets-section">
+          <h3>📥 Batch Import</h3>
+          <textarea id="batchTargets" class="batch-input" placeholder="Enter domains (one per line):
+example.com
+app.example.com
+api.example.com"></textarea>
+          <div class="batch-actions">
+            <button id="importTargetsBtn" class="btn btn-small btn-primary">📥 Import</button>
+            <button id="clearTargetsBtn" class="btn btn-small btn-secondary">🗑️ Clear</button>
+            <button id="scanAllTargetsBtn" class="btn btn-small btn-primary">🚀 Scan All</button>
+          </div>
+        </div>
+
+        <!-- Target List -->
+        <div class="targets-section">
+          <h3>📋 Active Targets (<span id="targetCount">0</span>)</h3>
+          <div id="targetsList" class="targets-list">
+            <div class="empty-state small">
+              <p>No targets added yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scan Progress -->
+        <div class="targets-section" id="scanProgressSection" style="display: none;">
+          <h3>⏳ Scan Progress</h3>
+          <div class="progress-bar">
+            <div class="progress-fill" id="scanProgress" style="width: 0%"></div>
+          </div>
+          <div class="progress-text">
+            <span id="scanCurrent">0</span> / <span id="scanTotal">0</span> targets scanned
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tutorials Tab -->
+    <div id="tutorialsTab" class="tab-content">
+      <div class="findings-container">
+        <div class="section-header">
+          <h2>📚 Knowledge Base</h2>
+        </div>
+
+        <div class="tutorials-preview">
+          <div class="tutorial-card" data-ecosystem="npm">
+            <div class="tutorial-icon">📦</div>
+            <div class="tutorial-info">
+              <h4>NPM Dependency Confusion</h4>
+              <p>Learn to exploit Node.js packages with preinstall hooks</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card" data-ecosystem="ruby">
+            <div class="tutorial-icon">💎</div>
+            <div class="tutorial-info">
+              <h4>Ruby Gems Attack</h4>
+              <p>$30k Shopify bounty technique - Gemfile exploitation</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card" data-ecosystem="python">
+            <div class="tutorial-icon">🐍</div>
+            <div class="tutorial-info">
+              <h4>Python PyPI Attack</h4>
+              <p>setup.py code execution during pip install</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card" data-ecosystem="go">
+            <div class="tutorial-icon">🔷</div>
+            <div class="tutorial-info">
+              <h4>Go Modules</h4>
+              <p>Module path hijacking and proxy.golang.org</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card" data-ecosystem="dorks">
+            <div class="tutorial-icon">🔍</div>
+            <div class="tutorial-info">
+              <h4>GitHub Dorking</h4>
+              <p>50+ dorks to find exposed dependency files</p>
+            </div>
+          </div>
+
+          <div class="tutorial-card" data-ecosystem="bounty">
+            <div class="tutorial-icon">💰</div>
+            <div class="tutorial-info">
+              <h4>Bug Bounty Reports</h4>
+              <p>$200k+ in bounties - report templates included</p>
+            </div>
+          </div>
+        </div>
+
+        <button id="openTutorialsBtn" class="btn btn-primary" style="width: 100%; margin-top: 16px;">
+          📖 Open Full Tutorial Guide
+        </button>
+
+        <div class="quick-reference" style="margin-top: 20px;">
+          <h3>⚡ Quick Reference</h3>
+
+          <div class="ref-section">
+            <h4>Registry Check URLs</h4>
+            <div class="ref-item"><code>npm</code>: https://registry.npmjs.org/{pkg}</div>
+            <div class="ref-item"><code>PyPI</code>: https://pypi.org/pypi/{pkg}/json</div>
+            <div class="ref-item"><code>RubyGems</code>: https://rubygems.org/api/v1/gems/{pkg}.json</div>
+            <div class="ref-item"><code>Go</code>: https://proxy.golang.org/{pkg}/@v/list</div>
+            <div class="ref-item"><code>Cargo</code>: https://crates.io/api/v1/crates/{pkg}</div>
+            <div class="ref-item"><code>Composer</code>: https://repo.packagist.org/p2/{pkg}.json</div>
+          </div>
+
+          <div class="ref-section">
+            <h4>Key Files to Find</h4>
+            <div class="ref-grid">
+              <span>package.json</span>
+              <span>Gemfile</span>
+              <span>requirements.txt</span>
+              <span>go.mod</span>
+              <span>Cargo.toml</span>
+              <span>composer.json</span>
+            </div>
+          </div>
+
+          <div class="ref-section">
+            <h4>Post-Install Hooks</h4>
+            <div class="ref-item"><code>npm</code>: preinstall, postinstall scripts</div>
+            <div class="ref-item"><code>pip</code>: setup.py execution</div>
+            <div class="ref-item"><code>gem</code>: extensions in gemspec</div>
+            <div class="ref-item"><code>cargo</code>: build.rs script</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools Tab -->
+    <div id="toolsTab" class="tab-content">
+      <div class="findings-container">
+        <div class="section-header">
+          <h2>🛠️ Advanced Tools</h2>
+        </div>
+
+        <!-- Confused Tool Generator -->
+        <div class="tools-section">
+          <h3>🔍 Confused Scanner</h3>
+          <p class="tool-desc">Multi-ecosystem dependency confusion scanner by Visma</p>
+          <div class="tool-input-group">
+            <select id="confusedEcosystem" class="tool-select">
+              <option value="npm">npm (package.json)</option>
+              <option value="pip">pip (requirements.txt)</option>
+              <option value="rubygems">RubyGems (Gemfile.lock)</option>
+              <option value="composer">Composer (composer.json)</option>
+              <option value="maven">Maven (pom.xml)</option>
+            </select>
+            <input type="text" id="confusedFile" class="tool-input" placeholder="File path (e.g., package.json)" value="package.json">
+          </div>
+          <div class="tool-output" id="confusedOutput">
+            <code># Install confused
+go install github.com/visma-prodsec/confused@latest
+
+# Run scanner
+confused -l npm package.json</code>
+          </div>
+          <div class="tool-actions">
+            <button id="generateConfusedCmd" class="btn btn-small btn-primary">🔄 Generate</button>
+            <button id="copyConfusedCmd" class="btn btn-small btn-secondary">📋 Copy</button>
+          </div>
+        </div>
+
+        <!-- Nuclei Template Generator -->
+        <div class="tools-section">
+          <h3>🎯 Nuclei Template Generator</h3>
+          <p class="tool-desc">Generate Nuclei templates for scanning exposed dependency files</p>
+          <div class="tool-input-group">
+            <input type="text" id="nucleiTarget" class="tool-input" placeholder="Target URL (e.g., https://example.com)">
+          </div>
+          <div class="tool-output nuclei-template" id="nucleiOutput">
+            <code id="nucleiTemplateCode">id: exposed-package-json
+
+info:
+  name: Exposed package.json
+  author: OFJAAAH
+  severity: info
+  tags: dependency-confusion
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/package.json"
+      - "{{BaseURL}}/package-lock.json"
+      - "{{BaseURL}}/yarn.lock"
+    matchers:
+      - type: word
+        words:
+          - '"dependencies"'
+          - '"devDependencies"'</code>
+          </div>
+          <div class="tool-actions">
+            <button id="generateNucleiTemplate" class="btn btn-small btn-primary">🔄 Generate Full</button>
+            <button id="copyNucleiTemplate" class="btn btn-small btn-secondary">📋 Copy</button>
+            <button id="downloadNucleiTemplate" class="btn btn-small btn-secondary">💾 Download</button>
+          </div>
+        </div>
+
+        <!-- Interactsh Setup -->
+        <div class="tools-section">
+          <h3>📡 Callback Servers</h3>
+          <p class="tool-desc">Setup commands for various callback/OOB servers</p>
+          <div class="tool-tabs">
+            <button class="tool-tab active" data-callback="interactsh">Interactsh</button>
+            <button class="tool-tab" data-callback="discord">Discord</button>
+            <button class="tool-tab" data-callback="pipedream">Pipedream</button>
+          </div>
+          <div class="tool-output" id="callbackServerOutput">
+            <code># Install Interactsh
+go install -v github.com/projectdiscovery/interactsh/cmd/interactsh-client@latest
+
+# Run client (will generate unique OOB URL)
+interactsh-client
+
+# Example URL format:
+# c23b2la0kl1krjcrdj10.oast.pro</code>
+          </div>
+          <div class="tool-actions">
+            <button id="copyCallbackSetup" class="btn btn-small btn-secondary">📋 Copy</button>
+          </div>
+        </div>
+
+        <!-- ghorg Reconnaissance -->
+        <div class="tools-section">
+          <h3>🐙 GitHub Reconnaissance (ghorg)</h3>
+          <p class="tool-desc">Clone entire GitHub organizations and extract dependencies</p>
+          <div class="tool-input-group">
+            <input type="text" id="ghorgTarget" class="tool-input" placeholder="GitHub organization (e.g., facebook)">
+          </div>
+          <div class="tool-output" id="ghorgOutput">
+            <code># Install ghorg
+go install github.com/gabrie30/ghorg@latest
+
+# Clone entire organization
+ghorg clone target-org -t YOUR_GITHUB_TOKEN
+
+# Extract package names
+find . -name "package.json" -exec cat {} \; | jq -r '.dependencies | keys[]' | sort -u > npm-packages.txt
+find . -name "requirements.txt" -exec cat {} \; | grep -v "^#" | cut -d'=' -f1 | sort -u > pip-packages.txt
+find . -name "Gemfile" -exec grep "gem " {} \; | awk '{print $2}' | tr -d "'" | tr -d '"' | sort -u > ruby-gems.txt</code>
+          </div>
+          <div class="tool-actions">
+            <button id="generateGhorgCmd" class="btn btn-small btn-primary">🔄 Generate</button>
+            <button id="copyGhorgCmd" class="btn btn-small btn-secondary">📋 Copy</button>
+          </div>
+        </div>
+
+        <!-- Package Publishing Commands -->
+        <div class="tools-section">
+          <h3>📦 Package Publishing</h3>
+          <p class="tool-desc">Commands to publish PoC packages to various registries</p>
+          <div class="tool-input-group">
+            <input type="text" id="publishPackageName" class="tool-input" placeholder="Package name">
+            <select id="publishEcosystem" class="tool-select">
+              <option value="npm">npm</option>
+              <option value="pypi">PyPI</option>
+              <option value="rubygems">RubyGems</option>
+              <option value="cargo">Cargo (Rust)</option>
+            </select>
+          </div>
+          <div class="tool-output" id="publishOutput">
+            <code># NPM Publishing Commands
+npm login
+npm init -y
+# Edit package.json with preinstall script
+npm publish --access public
+
+# Unpublish (within 72 hours)
+npm unpublish package-name --force</code>
+          </div>
+          <div class="tool-actions">
+            <button id="generatePublishCmd" class="btn btn-small btn-primary">🔄 Generate</button>
+            <button id="copyPublishCmd" class="btn btn-small btn-secondary">📋 Copy</button>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="tools-section">
+          <h3>🔗 Quick Links</h3>
+          <div class="quick-links-grid">
+            <a href="https://github.com/visma-prodsec/confused" target="_blank" class="quick-link">
+              <span class="link-icon">🔍</span>
+              <span>Confused Tool</span>
+            </a>
+            <a href="https://github.com/projectdiscovery/nuclei" target="_blank" class="quick-link">
+              <span class="link-icon">🎯</span>
+              <span>Nuclei Scanner</span>
+            </a>
+            <a href="https://github.com/projectdiscovery/interactsh" target="_blank" class="quick-link">
+              <span class="link-icon">📡</span>
+              <span>Interactsh</span>
+            </a>
+            <a href="https://github.com/gabrie30/ghorg" target="_blank" class="quick-link">
+              <span class="link-icon">🐙</span>
+              <span>ghorg</span>
+            </a>
+            <a href="https://www.npmjs.com/" target="_blank" class="quick-link">
+              <span class="link-icon">📦</span>
+              <span>npm Registry</span>
+            </a>
+            <a href="https://pypi.org/" target="_blank" class="quick-link">
+              <span class="link-icon">🐍</span>
+              <span>PyPI Registry</span>
+            </a>
+            <a href="https://rubygems.org/" target="_blank" class="quick-link">
+              <span class="link-icon">💎</span>
+              <span>RubyGems</span>
+            </a>
+            <a href="https://crates.io/" target="_blank" class="quick-link">
+              <span class="link-icon">🦀</span>
+              <span>Crates.io</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
     <div class="filter-section">
-      <input type="text" id="searchInput" placeholder="🔍 Buscar pacotes..." class="search-input">
+      <input type="text" id="searchInput" placeholder="🔍 Search packages..." class="search-input">
       <select id="typeFilter" class="filter-select">
-        <option value="all">Todos os tipos</option>
+        <option value="all">All Types</option>
         <option value="npm">NPM</option>
-        <option value="pip">PIP</option>
+        <option value="pip">PyPI</option>
+        <option value="gem">RubyGems</option>
+        <option value="go">Go Modules</option>
+        <option value="cargo">Cargo</option>
+        <option value="composer">Composer</option>
+        <option value="nuget">NuGet</option>
+        <option value="maven">Maven</option>
+      </select>
+      <select id="severityFilter" class="filter-select">
+        <option value="all">All Severities</option>
+        <option value="critical">Critical</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
       </select>
       <select id="confidenceFilter" class="filter-select">
-        <option value="0">Qualquer confiança</option>
-        <option value="70" selected>≥70% confiança</option>
-        <option value="90">≥90% confiança</option>
+        <option value="0">Any confidence</option>
+        <option value="70" selected>≥70% confidence</option>
+        <option value="90">≥90% confidence</option>
       </select>
     </div>
 
+    <!-- Info Section -->
     <div class="info-section">
       <details class="info-details">
-        <summary>ℹ️ Como funciona a detecção</summary>
+        <summary>ℹ️ Detection & Severity Guide</summary>
         <div class="info-content">
-          <p><strong>Alta confiança (≥90%):</strong> Pacotes encontrados em package.json, lock files, ou com padrão típico de nome npm.</p>
-          <p><strong>Média confiança (70-89%):</strong> Pacotes extraídos de require() ou import com nomes válidos.</p>
-          <p><strong>Baixa confiança (&lt;70%):</strong> Pode ser falso positivo - verifique manualmente.</p>
-          <p class="tip">💡 Dica: Sites como Instagram/Facebook são ignorados por padrão pois geram muitos falsos positivos.</p>
+          <h4>Confidence Levels:</h4>
+          <p><strong>High (≥90%):</strong> Packages found in package.json, lock files, or with typical npm naming patterns.</p>
+          <p><strong>Medium (70-89%):</strong> Packages extracted from require() or import with valid names.</p>
+          <p><strong>Low (&lt;70%):</strong> May be false positive - verify manually.</p>
+
+          <h4>Severity Levels:</h4>
+          <p><strong class="critical-text">Critical:</strong> CI/CD environment + secrets detected</p>
+          <p><strong class="high-text">High:</strong> CI/CD environment OR root user</p>
+          <p><strong class="medium-text">Medium:</strong> Local development machine</p>
+
+          <h4>Keyboard Shortcuts:</h4>
+          <div class="shortcuts-grid">
+            <span><kbd>Ctrl+R</kbd> Refresh</span>
+            <span><kbd>Ctrl+E</kbd> Export</span>
+            <span><kbd>Ctrl+P</kbd> Create PoC</span>
+            <span><kbd>Ctrl+S</kbd> Settings</span>
+            <span><kbd>Ctrl+1-7</kbd> Switch tabs</span>
+            <span><kbd>?</kbd> Help</span>
+          </div>
         </div>
       </details>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcutsModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h3>⌨️ Keyboard Shortcuts</h3>
+        <div class="shortcuts-list">
+          <div class="shortcut"><kbd>Ctrl+R</kbd> <span>Refresh findings</span></div>
+          <div class="shortcut"><kbd>Ctrl+E</kbd> <span>Export data</span></div>
+          <div class="shortcut"><kbd>Ctrl+P</kbd> <span>Create PoC package</span></div>
+          <div class="shortcut"><kbd>Ctrl+S</kbd> <span>Open settings</span></div>
+          <div class="shortcut"><kbd>Ctrl+X</kbd> <span>Clear current tab</span></div>
+          <div class="shortcut"><kbd>Ctrl+1</kbd> <span>Findings tab</span></div>
+          <div class="shortcut"><kbd>Ctrl+2</kbd> <span>History tab</span></div>
+          <div class="shortcut"><kbd>Ctrl+3</kbd> <span>Callbacks tab</span></div>
+          <div class="shortcut"><kbd>Ctrl+4</kbd> <span>Recon tab</span></div>
+          <div class="shortcut"><kbd>Ctrl+5</kbd> <span>Targets tab</span></div>
+          <div class="shortcut"><kbd>Ctrl+6</kbd> <span>Tutorials tab</span></div>
+          <div class="shortcut"><kbd>Ctrl+7</kbd> <span>Tools tab</span></div>
+          <div class="shortcut"><kbd>Esc</kbd> <span>Close modal</span></div>
+          <div class="shortcut"><kbd>?</kbd> <span>Show this help</span></div>
+        </div>
+        <button id="closeModalBtn" class="btn btn-primary">Close</button>
+      </div>
     </div>
   </div>
 

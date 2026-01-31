@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configurações - Dependency Hunter</title>
+  <title>Settings - Dependency Hunter</title>
   <style>
     * {
       margin: 0;
@@ -231,45 +231,164 @@
     .author-credit strong {
       color: #ff4444;
     }
+
+    /* Toggle Switch Styles */
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #1e1e2e;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .toggle-switch:hover {
+      background: #252535;
+    }
+
+    .toggle-switch.active {
+      border-color: #00d4aa;
+      background: rgba(0, 212, 170, 0.1);
+    }
+
+    .switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #3a3a4e;
+      transition: 0.4s;
+      border-radius: 26px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #888;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    .switch input:checked + .slider {
+      background-color: #00d4aa;
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(24px);
+      background-color: white;
+    }
+
+    .toggle-content {
+      flex: 1;
+    }
+
+    .toggle-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .toggle-desc {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .status-active {
+      background: rgba(0, 212, 170, 0.2);
+      color: #00d4aa;
+    }
+
+    .status-inactive {
+      background: #3a3a4e;
+      color: #888;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #3a3a4e;
+      border-top-color: #00d4aa;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>⚙️ Configurações</h1>
+      <h1>⚙️ Settings</h1>
       <p class="subtitle">Dependency Confusion Hunter</p>
     </header>
 
     <div id="alert" class="alert"></div>
 
     <div class="section">
-      <h2 class="section-title">🔔 Notificações</h2>
+      <h2 class="section-title">🔔 Notifications</h2>
 
       <div class="form-group">
         <label>Discord Webhook URL</label>
-        <input type="url" id="discordWebhook" placeholder="https://discord.com/api/webhooks/...">
+        <div style="display: flex; gap: 8px;">
+          <input type="url" id="discordWebhook" placeholder="https://discord.com/api/webhooks/..." style="flex: 1;">
+          <button type="button" id="testWebhookBtn" class="btn btn-secondary" style="flex: 0 0 auto; padding: 12px 16px;">
+            🧪 Test
+          </button>
+        </div>
         <p class="help-text">
-          Cole aqui a URL do webhook do Discord para receber notificações quando vulnerabilidades forem encontradas.
+          Paste the Discord webhook URL here to receive notifications when vulnerabilities are found.
         </p>
       </div>
 
       <div class="checkbox-group">
         <input type="checkbox" id="notificationsEnabled">
         <label for="notificationsEnabled">
-          Ativar notificações do navegador
-          <p class="help-text">Mostra notificações desktop quando vulnerabilidades são detectadas.</p>
+          Enable browser notifications
+          <p class="help-text">Shows desktop notifications when vulnerabilities are detected.</p>
         </label>
       </div>
     </div>
 
     <div class="section">
-      <h2 class="section-title">🔐 Autenticação NPM</h2>
+      <h2 class="section-title">🔐 NPM Authentication</h2>
 
       <div class="form-group">
         <label>NPM Token (opcional)</label>
         <input type="password" id="npmToken" placeholder="npm_xxxxxxxxxxxxxxxxxxxx">
         <p class="help-text">
-          Cole seu token de autenticação do npm para verificar pacotes em registros privados. Para gerar um token: <code>npm token create</code>
+          Paste your npm authentication token to check packages in private registries. To generate a token: <code>npm token create</code>
         </p>
       </div>
 
@@ -277,15 +396,15 @@
         <label>NPM Registry URL</label>
         <input type="url" id="npmRegistry" placeholder="https://registry.npmjs.org">
         <p class="help-text">
-          URL do registro npm. Use https://registry.npmjs.org para público ou o URL do seu registry privado.
+          npm registry URL. Use https://registry.npmjs.org for public or your private registry URL.
         </p>
       </div>
 
       <div class="checkbox-group">
         <input type="checkbox" id="npmAuthEnabled">
         <label for="npmAuthEnabled">
-          Usar autenticação npm
-          <p class="help-text">Ativa o uso do token npm nas verificações de pacotes.</p>
+          Use npm authentication
+          <p class="help-text">Enables the use of npm token in package checks.</p>
         </label>
       </div>
     </div>
@@ -297,95 +416,140 @@
         <label>Proxy URL (opcional)</label>
         <input type="text" id="proxyUrl" placeholder="http://proxy.example.com:8080">
         <p class="help-text">
-          Configure um proxy para as requisições de verificação de pacotes. Útil para ambientes corporativos ou para usar com ferramentas como Burp Suite.
+          Configure a proxy for package verification requests. Useful for corporate environments or for use with tools like Burp Suite.
         </p>
       </div>
     </div>
 
     <div class="section">
-      <h2 class="section-title">🔍 Detecção</h2>
+      <h2 class="section-title">🔍 Detection</h2>
 
       <div class="checkbox-group">
         <input type="checkbox" id="autoCheck">
         <label for="autoCheck">
-          Verificação automática
-          <p class="help-text">Verifica automaticamente se os pacotes encontrados existem nos registros públicos.</p>
+          Automatic verification
+          <p class="help-text">Automatically verifies if found packages exist in public registries.</p>
         </label>
       </div>
 
       <div class="checkbox-group">
         <input type="checkbox" id="showScopedPackages">
         <label for="showScopedPackages">
-          Mostrar pacotes scoped (@org/pacote)
-          <p class="help-text">Por padrão, pacotes scoped são ignorados. Ative para verificar pacotes @org/nome também.</p>
+          Show scoped packages (@org/package)
+          <p class="help-text">By default, scoped packages are ignored. Enable to also check @org/name packages.</p>
         </label>
       </div>
 
       <div class="checkbox-group">
         <input type="checkbox" id="enableHistory">
         <label for="enableHistory">
-          Ativar histórico
-          <p class="help-text">Mantém um histórico de todas as detecções (últimas 100 entradas).</p>
+          Enable history
+          <p class="help-text">Keeps a history of all detections (last 100 entries).</p>
         </label>
       </div>
 
       <div class="checkbox-group">
         <input type="checkbox" id="strictMode">
         <label for="strictMode">
-          Modo estrito (recomendado)
-          <p class="help-text">Filtra resultados mais agressivamente para reduzir falsos positivos. Desative apenas para análise profunda.</p>
+          Strict mode (recommended)
+          <p class="help-text">Filters results more aggressively to reduce false positives. Disable only for deep analysis.</p>
         </label>
       </div>
 
       <div class="form-group" style="margin-top: 16px;">
-        <label>Confiança mínima (%)</label>
+        <label>Minimum confidence (%)</label>
         <input type="number" id="minConfidence" min="0" max="100" placeholder="70">
         <p class="help-text">
-          Pacotes com confiança abaixo deste valor não serão mostrados. Recomendado: 70% para reduzir falsos positivos.
+          Packages with confidence below this value will not be shown. Recommended: 70% to reduce false positives.
         </p>
       </div>
 
       <div class="info-box">
-        <h3>ℹ️ Como funciona</h3>
+        <h3>ℹ️ How it works</h3>
         <p>
-          A extensão monitora passivamente os arquivos JavaScript e source maps carregados pelas páginas que você visita.
-          Ela extrai nomes de pacotes e verifica se eles existem no <code>npm</code> e <code>pip</code>.
-          Pacotes que não existem publicamente podem ser alvos para ataques de Dependency Confusion.
+          The extension passively monitors JavaScript files and source maps loaded by the pages you visit.
+          It extracts package names and checks if they exist in <code>npm</code>, <code>pip</code>, <code>RubyGems</code>, <code>crates.io</code>, <code>NuGet</code> e <code>Maven Central</code>.
+          Packages that do not exist publicly can be targets for Dependency Confusion attacks.
         </p>
       </div>
     </div>
 
     <div class="section">
-      <h2 class="section-title">🚫 Filtros de Domínio</h2>
+      <h2 class="section-title">📦 Ecosystems</h2>
+      <p class="help-text" style="margin-bottom: 16px;">Select which package registries should be checked. Disable those that are not relevant to reduce requests.</p>
 
       <div class="checkbox-group">
-        <input type="checkbox" id="ignoreKnownDomains">
-        <label for="ignoreKnownDomains">
-          Ignorar domínios conhecidos (recomendado)
-          <p class="help-text">Ignora sites como Instagram, Facebook, Google, etc. que geram muitos falsos positivos devido ao código bundled.</p>
+        <input type="checkbox" id="enableRubyGems" checked>
+        <label for="enableRubyGems">
+          RubyGems (Ruby)
+          <p class="help-text">Checks packages on rubygems.org. Detects Gemfile and Gemfile.lock.</p>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="enableCargo" checked>
+        <label for="enableCargo">
+          Cargo/crates.io (Rust)
+          <p class="help-text">Checks crates on crates.io. Detects Cargo.toml and Cargo.lock.</p>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="enableNuGet" checked>
+        <label for="enableNuGet">
+          NuGet (.NET/C#)
+          <p class="help-text">Checks packages on nuget.org. Detects .csproj, packages.config and .nuspec.</p>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="enableMaven" checked>
+        <label for="enableMaven">
+          Maven Central (Java/Kotlin)
+          <p class="help-text">Checks artifacts on Maven Central. Detects pom.xml and build.gradle.</p>
         </label>
       </div>
 
       <div class="form-group" style="margin-top: 16px;">
-        <label>Domínios ignorados personalizados</label>
+        <label>Rate Limit (ms between requests)</label>
+        <input type="number" id="rateLimitDelay" min="50" max="5000" placeholder="100">
+        <p class="help-text">
+          Minimum delay between package checks to avoid IP blocking. Default: 100ms (10 req/sec).
+        </p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">🚫 Domain Filters</h2>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="ignoreKnownDomains">
+        <label for="ignoreKnownDomains">
+          Ignore known domains (recommended)
+          <p class="help-text">Ignores sites like Instagram, Facebook, Google, etc. that generate many false positives due to bundled code.</p>
+        </label>
+      </div>
+
+      <div class="form-group" style="margin-top: 16px;">
+        <label>Custom ignored domains</label>
         <input type="text" id="customIgnoredDomains" placeholder="example.com, myapp.internal.com">
         <p class="help-text">
-          Lista de domínios adicionais para ignorar, separados por vírgula. Use quando um site específico gera muitos falsos positivos.
+          List of additional domains to ignore, separated by commas. Use when a specific site generates many false positives.
         </p>
       </div>
 
       <div class="info-box" style="border-left-color: #ffc107;">
-        <h3>⚠️ Domínios ignorados por padrão</h3>
+        <h3>⚠️ Domains ignored by default</h3>
         <p>
           Instagram, Facebook, WhatsApp, Messenger, Google, YouTube, Twitter/X, LinkedIn, TikTok, Reddit, Amazon, Netflix, Spotify, Discord, Twitch, Microsoft, Apple, Adobe.
-          Esses sites usam módulos internos que parecem pacotes mas não são.
+          These sites use internal modules that look like packages but are not.
         </p>
       </div>
     </div>
 
     <div class="button-group">
-      <button id="saveBtn" class="btn btn-primary">💾 Salvar Configurações</button>
-      <button id="resetBtn" class="btn btn-secondary">🔄 Restaurar Padrões</button>
+      <button id="saveBtn" class="btn btn-primary">💾 Save Settings</button>
+      <button id="resetBtn" class="btn btn-secondary">🔄 Reset Defaults</button>
     </div>
 
     <div class="author-credit">

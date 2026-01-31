@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Dependency Confusion Hunter",
-  "version": "1.1.1",
-  "description": "Passive scanner for dependency confusion vulnerabilities - by OFJAAAH",
+  "version": "1.4.0",
+  "description": "Advanced passive scanner for dependency confusion vulnerabilities across npm, PyPI, RubyGems, Go, Cargo, Composer - by OFJAAAH",
   "author": "OFJAAAH",
   "permissions": [
     "storage",
@@ -40,7 +40,7 @@
   "options_page": "options.html",
   "web_accessible_resources": [
     {
-      "resources": ["injected.js"],
+      "resources": ["injected.js", "poc-workflow.html", "poc-workflow.js", "tutorials.html"],
       "matches": ["<all_urls>"]
     }
   ]

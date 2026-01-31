@@ -1,0 +1,30 @@
+{
+  "name": "vulnerable-corp-app",
+  "version": "1.0.0",
+  "description": "Demo application with internal dependencies for testing Dependency Confusion Hunter",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@vulncorp/internal-auth-lib": "^1.0.0",
+    "@vulncorp/payment-processor": "^2.3.1",
+    "vulncorp-secret-utils": "^0.5.0",
+    "internal-logging-service": "^1.2.0",
+    "lodash": "^4.17.21",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@vulncorp/internal-build-tools": "^3.0.0",
+    "@vulncorp/eslint-config-internal": "^1.5.0",
+    "internal-test-framework": "^2.0.0"
+  },
+  "author": "VulnCorp Internal",
+  "license": "PROPRIETARY",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.internal.vulncorp.com/frontend/main-app.git"
+  }
+}

@@ -45,18 +45,18 @@
 <body>
   <div class="card">
     <h1>🎯 Dependency Confusion Hunter - Test Page</h1>
-    <p>Esta página contém referências a pacotes que podem não existir publicamente, para testar a extensão.</p>
+    <p>This page contains references to packages that may not exist publicly, to test the extension.</p>
 
     <div class="warning">
-      <strong>⚠️ Aviso:</strong> Esta é uma página de teste. Os pacotes referenciados podem ou não existir.
+      <strong>⚠️ Aviso:</strong> This is a test page. Referenced packages may or may not exist.
     </div>
   </div>
 
   <div class="card">
-    <h2>📦 Pacotes de Teste</h2>
-    <p>Esta página simula o uso de pacotes internos que podem ser vulneráveis:</p>
+    <h2>📦 Test Packages</h2>
+    <p>This page simulates the use of internal packages that may be vulnerable:</p>
     <ul>
-      <li><code>company-internal-auth-utils</code> - Pacote de autenticação interno</li>
+      <li><code>company-internal-auth-utils</code> - Internal authentication package</li>
       <li><code>private-api-client-sdk</code> - SDK privado de API</li>
       <li><code>internal-logging-framework</code> - Framework de logging</li>
       <li><code>custom-data-processor</code> - Processador de dados customizado</li>
@@ -64,30 +64,30 @@
   </div>
 
   <div class="card info">
-    <h3>ℹ️ Como testar</h3>
+    <h3>ℹ️ How to test</h3>
     <ol>
-      <li>Certifique-se de que a extensão está instalada e ativada</li>
-      <li>Abra esta página no Chrome</li>
-      <li>Aguarde alguns segundos para a extensão analisar</li>
-      <li>Clique no ícone da extensão para ver os resultados</li>
-      <li>Verifique se os pacotes listados acima foram detectados</li>
+      <li>Make sure the extension is installed and enabled</li>
+      <li>Open this page in Chrome</li>
+      <li>Wait a few seconds for the extension to analyze</li>
+      <li>Click on the extension icon to see the results</li>
+      <li>Check if the packages listed above were detected</li>
     </ol>
   </div>
 
   <script>
-    // Simulação de código que usa pacotes privados
-    // Estes pacotes provavelmente não existem no npm público
+    // Simulation of code that uses private packages
+    // These packages probably don't exist on public npm
 
-    // Exemplo 1: require style
+    // Example 1: require style
     // const auth = require('company-internal-auth-utils');
 
-    // Exemplo 2: import style
+    // Example 2: import style
     // import { apiClient } from 'private-api-client-sdk';
 
-    // Exemplo 3: dynamic import
+    // Example 3: dynamic import
     // const logger = await import('internal-logging-framework');
 
-    // Exemplo 4: código inline com referências
+    // Example 4: inline code with references
     const packageInfo = {
       dependencies: {
         "company-internal-auth-utils": "^1.0.0",
@@ -97,15 +97,15 @@
       }
     };
 
-    // Simulação de uso de node_modules
-    // Normalmente isso não apareceria em código frontend, mas pode aparecer em source maps
+    // Simulation of node_modules usage
+    // Normally this wouldn't appear in frontend code, but it can appear in source maps
     const modulePath = 'node_modules/company-internal-auth-utils/dist/index.js';
 
     console.log('Test page loaded. Extension should detect these packages.');
     console.log('Package info:', packageInfo);
     console.log('Module path:', modulePath);
 
-    // Adicionar código que simula imports
+    // Add code that simulates imports
     const fakeCode = `
       import { authenticate } from 'company-internal-auth-utils';
       import { fetchData } from 'private-api-client-sdk';
@@ -113,12 +113,12 @@
       import { process } from 'custom-data-processor';
     `;
 
-    // Log para o console (a extensão monitora isso)
+    // Log to console (extension monitors this)
     console.log('Simulated code:', fakeCode);
   </script>
 
   <script>
-    // Script adicional com mais referências
+    // Additional script with more references
     (function() {
       // Simular webpack require
       function __webpack_require__(moduleId) {
@@ -127,7 +127,7 @@
         return {};
       }
 
-      // Python-style imports (caso a extensão detecte)
+      // Python-style imports (in case the extension detects)
       const pythonCode = `
         import internal_company_package
         from private_ml_framework import train_model

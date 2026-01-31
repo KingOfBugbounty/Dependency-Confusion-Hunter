@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vulnerable Corp - Internal App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 40px;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e94560;
+    }
+    h1 { color: #e94560; font-size: 2.5em; margin-bottom: 10px; }
+    .subtitle { color: #888; }
+    .warning-box {
+      background: rgba(233, 69, 96, 0.2);
+      border: 2px solid #e94560;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .warning-box h3 { color: #e94560; margin-bottom: 10px; }
+    .success-box {
+      background: rgba(0, 212, 170, 0.2);
+      border: 2px solid #00d4aa;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .success-box h3 { color: #00d4aa; margin-bottom: 10px; }
+    code {
+      background: #0f0f1a;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #00d4aa;
+    }
+    pre {
+      background: #0f0f1a;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 15px 0;
+    }
+    pre code { background: none; padding: 0; }
+    .packages-list {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .package-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #333;
+    }
+    .package-item:last-child { border-bottom: none; }
+    .package-name { color: #e94560; font-weight: bold; font-family: monospace; }
+    .package-status { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .package-status.vulnerable { background: rgba(255, 68, 68, 0.2); color: #ff4444; }
+    .package-status.safe { background: rgba(68, 255, 68, 0.2); color: #44ff44; }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+      color: #666;
+    }
+    .instructions {
+      background: rgba(100, 149, 237, 0.1);
+      border: 1px solid #6495ed;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .instructions h3 { color: #6495ed; margin-bottom: 15px; }
+    .instructions ol { margin-left: 20px; line-height: 2; }
+    .instructions li { margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Vulnerable Corp</h1>
+      <p class="subtitle">Internal Application - Demo for Dependency Confusion Testing</p>
+    </header>
+
+    <div class="warning-box">
+      <h3>⚠️ SECURITY RESEARCH DEMO</h3>
+      <p>This page simulates a vulnerable application that exposes internal package names. The Dependency Confusion Hunter extension will detect these packages automatically.</p>
+    </div>
+
+    <div class="instructions">
+      <h3>📋 How to Test</h3>
+      <ol>
+        <li>Open the extension <strong>Dependency Confusion Hunter</strong></li>
+        <li>The packages below will be automatically detected</li>
+        <li>Click on <strong>"🚀 Create PoC"</strong> on any package to generate and publish</li>
+        <li>Configure <strong>npm token</strong> and <strong>Interactsh</strong> in settings</li>
+        <li>Wait for callback when someone installs the package</li>
+      </ol>
+    </div>
+
+    <h2 style="margin: 30px 0 15px;">🎯 Internal Packages Detected</h2>
+    <div class="packages-list" id="packagesList">
+      <div class="package-item">
+        <span class="package-name">ofjaaah-internal-utils</span>
+        <span class="package-status vulnerable">❌ Does not exist on npm</span>
+      </div>
+      <div class="package-item">
+        <span class="package-name">ofjaaah-security-lib</span>
+        <span class="package-status vulnerable">❌ Does not exist on npm</span>
+      </div>
+      <div class="package-item">
+        <span class="package-name">ofjaaah-auth-module</span>
+        <span class="package-status vulnerable">❌ Does not exist on npm</span>
+      </div>
+      <div class="package-item">
+        <span class="package-name">internal-company-sdk</span>
+        <span class="package-status vulnerable">❌ Does not exist on npm</span>
+      </div>
+      <div class="package-item">
+        <span class="package-name">private-payment-lib</span>
+        <span class="package-status vulnerable">❌ Does not exist on npm</span>
+      </div>
+    </div>
+
+    <div class="success-box">
+      <h3>✅ Packages that will be detected by the extension</h3>
+      <p>The extension automatically analyzes:</p>
+      <ul style="margin: 10px 0 0 20px;">
+        <li>package.json exposto</li>
+        <li>require() and import references</li>
+        <li>Caminhos node_modules em source maps</li>
+        <li>Webpack module definitions</li>
+      </ul>
+    </div>
+
+    <h2 style="margin: 30px 0 15px;">📦 package.json Exposto</h2>
+    <pre><code id="packageJsonDisplay"></code></pre>
+
+    <h2 style="margin: 30px 0 15px;">📜 JavaScript Code with References</h2>
+    <pre><code>// Simulated internal imports
+const utils = require('ofjaaah-internal-utils');
+const security = require('ofjaaah-security-lib');
+const auth = require('ofjaaah-auth-module');
+import { SDK } from 'internal-company-sdk';
+import PaymentLib from 'private-payment-lib';
+
+// node_modules paths (detected from source maps)
+// webpack:///./node_modules/ofjaaah-internal-utils/index.js
+// webpack:///./node_modules/ofjaaah-security-lib/lib/main.js
+// webpack:///./node_modules/ofjaaah-auth-module/src/auth.js</code></pre>
+
+    <footer>
+      <p>🎯 Dependency Confusion Hunter PoC - by OFJAAAH</p>
+      <p style="margin-top: 10px; font-size: 12px;">For authorized security testing</p>
+    </footer>
+  </div>
+
+  <!-- Expose package.json for extension detection -->
+  <script id="package-json-data" type="application/json">
+{
+  "name": "vulnerable-corp-internal-app",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "ofjaaah-internal-utils": "^1.0.0",
+    "ofjaaah-security-lib": "^2.0.0",
+    "ofjaaah-auth-module": "^1.5.0",
+    "internal-company-sdk": "^3.0.0",
+    "private-payment-lib": "^1.0.0",
+    "express": "^4.18.2",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "ofjaaah-build-tools": "^1.0.0",
+    "internal-test-framework": "^2.0.0"
+  }
+}
+  </script>
+
+  <script>
+    // Display package.json
+    const pkgData = document.getElementById('package-json-data').textContent;
+    document.getElementById('packageJsonDisplay').textContent = pkgData.trim();
+
+    // Expose dependencies globally for extension detection
+    window.__WEBPACK_MODULES__ = {
+      './node_modules/ofjaaah-internal-utils/index.js': () => {},
+      './node_modules/ofjaaah-security-lib/lib/main.js': () => {},
+      './node_modules/ofjaaah-auth-module/src/auth.js': () => {},
+      './node_modules/internal-company-sdk/index.js': () => {},
+      './node_modules/private-payment-lib/lib/payment.js': () => {}
+    };
+
+    // Simulate webpack require
+    window.webpackJsonp = [
+      [0, {
+        'ofjaaah-internal-utils': function(e, t, n) { },
+        'ofjaaah-security-lib': function(e, t, n) { },
+        'ofjaaah-auth-module': function(e, t, n) { },
+        'internal-company-sdk': function(e, t, n) { },
+        'private-payment-lib': function(e, t, n) { }
+      }]
+    ];
+
+    // Simulate require calls for detection
+    const fakeRequire = (pkg) => console.log(`[SIMULATED] require('${pkg}')`);
+    fakeRequire('ofjaaah-internal-utils');
+    fakeRequire('ofjaaah-security-lib');
+    fakeRequire('ofjaaah-auth-module');
+    fakeRequire('internal-company-sdk');
+    fakeRequire('private-payment-lib');
+
+    console.log('[PoC] Vulnerable Corp Demo loaded');
+    console.log('[PoC] Extension should detect these packages:', [
+      'ofjaaah-internal-utils',
+      'ofjaaah-security-lib',
+      'ofjaaah-auth-module',
+      'internal-company-sdk',
+      'private-payment-lib'
+    ]);
+  </script>
+</body>
+</html>
